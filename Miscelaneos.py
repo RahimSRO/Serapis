@@ -1306,8 +1306,7 @@ KillClientCheck = QtBind.createCheckBox(gui,'AutoClientless','Auto Clientless',5
 QtBind.setChecked(gui, KillClientCheck, True)
 
 def testinger():
-	name = 'Miscelaneos'
-	descargar_txt(name)
+	update_plugin()
 	return
 	player_id = get_character_data()['player_id']
 	log(f'{player_id}')
@@ -2732,10 +2731,18 @@ def zerkoff():
 invite = False
 tracebuff = False
 
-def descargar_txt(name):
+def update_plugin():
     try:
-        urllib.request.urlretrieve(f'https://raw.githubusercontent.com/RahimSRO/Serapis/refs/heads/main/{name}.txt', f'{name}.txt')
-        log(f"Archivo guardado como: {name}.txt")
+        urllib.request.urlretrieve('https://raw.githubusercontent.com/RahimSRO/Serapis/refs/heads/main/Miscelaneos.py', 'Plugins/Miscelaneos.py')
+        log(f"Archivo guardado como: Miscelaneos.py")
+    except Exception as e:
+        log(f"Error al descargar el archivo: {e}")
+
+def update_town(name):
+	name = name+'.txt'
+    try:
+        urllib.request.urlretrieve(f'https://raw.githubusercontent.com/RahimSRO/Serapis/refs/heads/main/{name}', f'Town/{name}')
+        log(f"Archivo guardado como: {name}")
     except Exception as e:
         log(f"Error al descargar el archivo: {e}")
 
@@ -2768,8 +2775,9 @@ def handle_chat(t,player,msg):
 		splited = msg.split()
 		phBotChat.Private(splited[1],splited[2])
 	elif msg == 'down!' and get_character_data()['name'] == player:
-		name = 'Miscelaneos'
-		descargar_txt(name)
+		update_plugin()
+	elif msg == 'town!' and get_character_data()['name'] == player:
+		update_town()
 	elif msg == 'eshield':
 		equipShield()
 	elif msg == 'punto':
