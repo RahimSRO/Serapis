@@ -2740,11 +2740,11 @@ def update_plugin():
 
 def update_town(name):
 	name = name+'.txt'
-    try:
-        urllib.request.urlretrieve(f'https://raw.githubusercontent.com/RahimSRO/Serapis/refs/heads/main/{name}', f'Town/{name}')
-        log(f"Archivo guardado como: {name}")
-    except Exception as e:
-        log(f"Error al descargar el archivo: {e}")
+	try:
+		urllib.request.urlretrieve(f'https://raw.githubusercontent.com/RahimSRO/Serapis/refs/heads/main/{name}', f'Town/{name}')
+		log(f"Archivo guardado como: {name}")
+	except Exception as e:
+		log(f"Error al descargar el archivo: {e}")
 
 def handle_chat(t,player,msg):
 	#1 All
@@ -2774,8 +2774,8 @@ def handle_chat(t,player,msg):
 	elif '/p' in msg:
 		splited = msg.split()
 		phBotChat.Private(splited[1],splited[2])
-	elif msg == 'down!' and get_character_data()['name'] == player:
-		update_plugin()
+	elif msg[:5] == 'down!' and get_character_data()['name'] == player:
+		update_plugin(msg[5:])
 	elif msg == 'town!' and get_character_data()['name'] == player:
 		update_town()
 	elif msg == 'eshield':
