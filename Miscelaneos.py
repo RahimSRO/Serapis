@@ -2774,9 +2774,9 @@ def handle_chat(t,player,msg):
 	elif '/p' in msg:
 		splited = msg.split()
 		phBotChat.Private(splited[1],splited[2])
-	elif msg[:5] == 'down!' and get_character_data()['name'] == player:
+	elif msg == 'down!' and get_character_data()['name'] == player:
 		update_plugin()
-	elif msg == 'town!' and get_character_data()['name'] == player:
+	elif msg[:5] == 'town!' and get_character_data()['name'] == player:
 		log(f'updating {msg[5:]}')
 		update_town(msg[5:])
 	elif msg == 'eshield':
