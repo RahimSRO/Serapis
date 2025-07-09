@@ -737,6 +737,12 @@ def handle_joymax(opcode, data):
 			if QtBind.text(gui,uniqueSTRname) != '' and QtBind.text(gui,uniqueSTRname).lower() in get_monster(struct.unpack_from('<I', data, 2)[0])['name'].lower():
 				log('EJECUTANDO SCRIPT DE CAMBIO')
 				Timer(10,afterUnique).start()
+		elif data == bytes.fromhex('08 0C') and get_character_data()['name'] == 'Trump':
+			threading.Thread(target=sendTelegram, args=['Special trader shops with Bargain goods will start in 30 minutes.']).start()
+		elif data == bytes.fromhex('09 0C') and get_character_data()['name'] == 'Trump':
+			threading.Thread(target=sendTelegram, args=['Special trader shops with Bargain goods has started.']).start()
+		elif data == bytes.fromhex('0A 0C') and get_character_data()['name'] == 'Trump':
+			threading.Thread(target=sendTelegram, args=['Special trader shops with Bargain goods has ended.']).start()
 	elif opcode == 0x3080: #SERVER_GAME_PETITION_REQUEST exchange
 		log('exchanginer')
 		if data[0] == 1:
@@ -2769,8 +2775,12 @@ def handle_chat(t,player,msg):
 	global targetBol
 	global invite
 	global tracebuff
+	global UniqueAlert
 	if msg == '.c':
 		inject_joymax(0x705B, bytearray(), False)
+	elif msg == '/z' and get_character_data()['name'] == player:
+		UniqueAlert = not UniqueAlert
+		QtBind.setChecked(gui, UniqueCheck, UniqueAlert)
 	elif '/p' in msg:
 		splited = msg.split()
 		phBotChat.Private(splited[1],splited[2])
@@ -3637,7 +3647,7 @@ def changeTrainingArea(area):
 
 def killAfterJoined(dcName):
 	global CLIENTLESS_BOL
-	ignore_dc_names = ['Seven','Zoser','Norte','Gana','Clear','Trump']
+	ignore_dc_names = ['Seven','Zoser','Norte','Gana','Clear','Mol']
 	if CLIENTLESS_BOL and dcName not in ignore_dc_names:
 		log('not in dc name')
 		killClient()
