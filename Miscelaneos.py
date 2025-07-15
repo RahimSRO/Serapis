@@ -1312,8 +1312,9 @@ KillClientCheck = QtBind.createCheckBox(gui,'AutoClientless','Auto Clientless',5
 QtBind.setChecked(gui, KillClientCheck, True)
 
 def testinger():
-	update_plugin()
+	log(str(get_character_data()['model']))
 	return
+	update_plugin()
 	player_id = get_character_data()['player_id']
 	log(f'{player_id}')
 	message = 'Mensaje de prueba'
@@ -1419,7 +1420,10 @@ def kick(slot=8):
 
 
 def crystal():
-	if get_quests()[371]['completed']:
+	if get_character_data()['model'] > 2000:
+		if get_quests()[371]['completed']:
+			useSpecialReturnScroll()
+	elif get_quests()[357]['completed']:
 		useSpecialReturnScroll()
 	else:
 		for slot, item in enumerate(get_inventory()['items']):
@@ -2883,6 +2887,7 @@ def handle_chat(t,player,msg):
 	elif t == 2 and msg.lower() == 'str':
 		questSTR()
 	elif msg == 'crystal' and get_character_data()['name'] == player:
+		morado('crystaleando')
 		crystal()
 	elif msg == 'sort':
 		sort_inventory()
@@ -3647,7 +3652,7 @@ def changeTrainingArea(area):
 
 def killAfterJoined(dcName):
 	global CLIENTLESS_BOL
-	ignore_dc_names = ['Seven','Zoser','Norte','Gana','Clear','Mol']
+	ignore_dc_names = ['Seven','Zoser','Norte','Gana','Clear']
 	if CLIENTLESS_BOL and dcName not in ignore_dc_names:
 		log('not in dc name')
 		killClient()
