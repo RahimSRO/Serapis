@@ -3896,4 +3896,4 @@ def ChangeBotOption(args,reload):
 					reload_profile()
 				return 0
 
-log('[%s] Loaded' % __name__)
+log('[%s] Loaded v1.0' % __name__)
