@@ -304,7 +304,7 @@ def easyPick(k=0):
 			if 'immortal' in drops[dropID]['name'].lower():
 				if k != 0:
 					inject_joymax(0x70C5, struct.pack('I', k) + b'\x08' + struct.pack('I', dropID), False)
-				inject_joymax(0x7074, b'\x01\x02\x01' + struct.pack('I', dropID), False)
+				# inject_joymax(0x7074, b'\x01\x02\x01' + struct.pack('I', dropID), False)
 				log(drops[dropID]['name'])
 				Timer(0.3,easyPick,[k]).start()
 				return
@@ -318,7 +318,7 @@ def easyPick(k=0):
 			if 'silk' in drops[dropID]['name'].lower():
 				if k != 0:
 					inject_joymax(0x70C5, struct.pack('I', k) + b'\x08' + struct.pack('I', dropID), False)
-				inject_joymax(0x7074, b'\x01\x02\x01' + struct.pack('I', dropID), False)
+				# inject_joymax(0x7074, b'\x01\x02\x01' + struct.pack('I', dropID), False)
 				log(drops[dropID]['name'])
 				Timer(0.3,easyPick,[k]).start()
 				return
@@ -326,7 +326,7 @@ def easyPick(k=0):
 			if 'pop' in drops[dropID]['name'].lower():
 				if k != 0:
 					inject_joymax(0x70C5, struct.pack('I', k) + b'\x08' + struct.pack('I', dropID), False)
-				inject_joymax(0x7074, b'\x01\x02\x01' + struct.pack('I', dropID), False)
+				# inject_joymax(0x7074, b'\x01\x02\x01' + struct.pack('I', dropID), False)
 				log(drops[dropID]['name'])
 				Timer(0.3,easyPick,[k]).start()
 				return
@@ -340,7 +340,7 @@ def easyPick(k=0):
 			if 'arena' in drops[dropID]['name'].lower():
 				if k != 0:
 					inject_joymax(0x70C5, struct.pack('I', k) + b'\x08' + struct.pack('I', dropID), False)
-				inject_joymax(0x7074, b'\x01\x02\x01' + struct.pack('I', dropID), False)
+				# inject_joymax(0x7074, b'\x01\x02\x01' + struct.pack('I', dropID), False)
 				log(drops[dropID]['name'])
 				Timer(0.3,easyPick,[k]).start()
 				return
@@ -348,7 +348,7 @@ def easyPick(k=0):
 			if 'reverse' in drops[dropID]['name'].lower():
 				if k != 0:
 					inject_joymax(0x70C5, struct.pack('I', k) + b'\x08' + struct.pack('I', dropID), False)
-				inject_joymax(0x7074, b'\x01\x02\x01' + struct.pack('I', dropID), False)
+				#inject_joymax(0x7074, b'\x01\x02\x01' + struct.pack('I', dropID), False)
 				log(drops[dropID]['name'])
 				Timer(0.3,easyPick,[k]).start()
 				return
@@ -356,7 +356,7 @@ def easyPick(k=0):
 			if 'carnival' in drops[dropID]['name'].lower():
 				if k != 0:
 					inject_joymax(0x70C5, struct.pack('I', k) + b'\x08' + struct.pack('I', dropID), False)
-				inject_joymax(0x7074, b'\x01\x02\x01' + struct.pack('I', dropID), False)
+				# inject_joymax(0x7074, b'\x01\x02\x01' + struct.pack('I', dropID), False)
 				log(drops[dropID]['name'])
 				Timer(0.3,easyPick,[k]).start()
 				return
@@ -364,7 +364,7 @@ def easyPick(k=0):
 			if 'repair' in drops[dropID]['name'].lower():
 				if k != 0:
 					inject_joymax(0x70C5, struct.pack('I', k) + b'\x08' + struct.pack('I', dropID), False)
-				inject_joymax(0x7074, b'\x01\x02\x01' + struct.pack('I', dropID), False)
+				# inject_joymax(0x7074, b'\x01\x02\x01' + struct.pack('I', dropID), False)
 				log(drops[dropID]['name'])
 				Timer(0.3,easyPick,[k]).start()
 				return
@@ -372,7 +372,7 @@ def easyPick(k=0):
 			if 'stepflare' in drops[dropID]['name'].lower():
 				if k != 0:
 					inject_joymax(0x70C5, struct.pack('I', k) + b'\x08' + struct.pack('I', dropID), False)
-				inject_joymax(0x7074, b'\x01\x02\x01' + struct.pack('I', dropID), False)
+				# inject_joymax(0x7074, b'\x01\x02\x01' + struct.pack('I', dropID), False)
 				log( drops[dropID]['name'])
 				Timer(0.3,easyPick,[k]).start()
 				return
@@ -380,7 +380,7 @@ def easyPick(k=0):
 			if 'global' in drops[dropID]['name'].lower():
 				if k != 0:
 					inject_joymax(0x70C5, struct.pack('I', k) + b'\x08' + struct.pack('I', dropID), False)
-				inject_joymax(0x7074, b'\x01\x02\x01' + struct.pack('I', dropID), False)
+				# inject_joymax(0x7074, b'\x01\x02\x01' + struct.pack('I', dropID), False)
 				log(drops[dropID]['name'])
 				Timer(0.3,easyPick,[k]).start()
 				return
@@ -388,12 +388,41 @@ def easyPick(k=0):
 			if 'gold' in drops[dropID]['name'].lower():
 				if k != 0:
 					inject_joymax(0x70C5, struct.pack('I', k) + b'\x08' + struct.pack('I', dropID), False)
-					log(drops[dropID]['name'])
-					Timer(0.3,easyPick,[k]).start()
-					return
-				# inject_joymax(0x7074, b'\x01\x02\x01' + struct.pack('I', dropID), False)
-				# log(drops[dropID]['name'])
-				# Timer(0.3,easyPick,[k]).start()
+				log(drops[dropID]['name'])
+				Timer(0.3,easyPick,[k]).start()
+				return
+				return
+
+def NotEasyPick():
+	drops = get_drops()
+	if drops:
+		for dropID in drops:
+			if 'Gold' in drops[dropID]['name']:
+				verdemini(drops[dropID]['name'])
+				inject_joymax(0x7074, b'\x01\x02\x01' + struct.pack('I', dropID), False)
+				log(drops[dropID]['name'])
+				Timer(0.3,NotEasyPick).start()
+				return
+		for dropID in drops:
+			if 'global' in drops[dropID]['name'].lower():
+				verdemini(drops[dropID]['name'])
+				inject_joymax(0x7074, b'\x01\x02\x01' + struct.pack('I', dropID), False)
+				log(drops[dropID]['name'])
+				Timer(0.3,NotEasyPick).start()
+				return
+		for dropID in drops:
+			if 'repair' in drops[dropID]['name'].lower():
+				verdemini(drops[dropID]['name'])
+				inject_joymax(0x7074, b'\x01\x02\x01' + struct.pack('I', dropID), False)
+				log(drops[dropID]['name'])
+				Timer(0.3,NotEasyPick).start()
+				return
+		for dropID in drops:
+			if 'reverse' in drops[dropID]['name'].lower():
+				verdemini(drops[dropID]['name'])
+				inject_joymax(0x7074, b'\x01\x02\x01' + struct.pack('I', dropID), False)
+				log(drops[dropID]['name'])
+				Timer(0.3,NotEasyPick).start()
 				return
 
 def easyPickOLD(k=0):
@@ -732,6 +761,7 @@ def handle_joymax(opcode, data):
 		elif data[0] == 6:
 			if get_character_data()['region'] != 25037:
 				easyPick()
+				NotEasyPick()
 			name = str(data[8:])[2:-1]
 			log(name + ' Killed  -> '+ get_monster(struct.unpack_from('<I', data, 2)[0])['name'])
 			if QtBind.text(gui,uniqueSTRname) != '' and QtBind.text(gui,uniqueSTRname).lower() in get_monster(struct.unpack_from('<I', data, 2)[0])['name'].lower():
@@ -908,7 +938,7 @@ def spawnPets():
 		return
 	items = get_inventory()['items']
 	for slot, item in enumerate(items):
-		if item and 'Red Dragon' in item['name'] and not dragon:
+		if item and ('Red Dragon' in item['name'] or 'Griffin' in item['name']) and not dragon:
 			log('Summoning: '+ item['name'])
 			inject_joymax(0x704C, struct.pack('b',slot)+b'\xCD\x08', True)
 			Timer(0.5,spawnPets).start()
@@ -1129,6 +1159,7 @@ def handle_silkroad(opcode,data):
 			morado('4')
 			return False
 		elif data ==  b'\x04':
+			morado('Pick with hand')
 			threading.Thread(target=picky).start()
 			return False
 		elif data ==  b'\x03':
@@ -1312,6 +1343,9 @@ KillClientCheck = QtBind.createCheckBox(gui,'AutoClientless','Auto Clientless',5
 QtBind.setChecked(gui, KillClientCheck, True)
 
 def testinger():
+	NotEasyPick()
+	log(str(get_drops()))
+	return
 	log(str(get_character_data()['model']))
 	return
 	update_plugin()
@@ -2036,7 +2070,7 @@ def goUnique():
 									inject_joymax(0x70C5, struct.pack('i', petID) +b'\x02' +struct.pack('i', mobID), False)
 									break
 					if dis < 100:
-						DismountHorse()
+						Dismount()
 						return
 				else:
 					return
@@ -3005,6 +3039,7 @@ def handle_chat(t,player,msg):
 		stop_bot()
 		reverse_return(3, "Seenwald")
 	elif ((t == 2 and player == 'Seven') or player == get_character_data()['name']) and msg.lower() == 'tptg':
+		inject_joymax(0x715F, bytes.fromhex('EF 8A 00 00 D3 0E 00 00 07 1C 00 00 00'), False)
 		stop_trace()
 		stop_bot()
 		reverse_return(3, "Bandit-Bergfestung")
@@ -3013,6 +3048,7 @@ def handle_chat(t,player,msg):
 		stop_bot()
 		reverse_return(3, "Heart Peak")
 	elif ((t == 2 and player == 'Seven') or player == get_character_data()['name']) and msg.lower() == 'tpuru1':
+		inject_joymax(0x715F, bytes.fromhex('EF 8A 00 00 D3 0E 00 00 07 16 00 00 00'), False)
 		stop_trace()
 		stop_bot()
 		reverse_return(3, "Black-Robber-Lager")
@@ -3021,10 +3057,12 @@ def handle_chat(t,player,msg):
 		stop_bot()
 		reverse_return(3, "Tarimbecken")
 	elif ((t == 2 and player == 'Seven') or player == get_character_data()['name']) and msg.lower() == 'tplord1':
+		inject_joymax(0x715F, bytes.fromhex('EF 8A 00 00 D3 0E 00 00 07 0E 00 00 00'), False)
 		stop_trace()
 		stop_bot()
 		reverse_return(3, "Niya-Ruine")
 	elif ((t == 2 and player == 'Seven') or player == get_character_data()['name']) and msg.lower() == 'tplord2':
+		inject_joymax(0x715F, bytes.fromhex('EF 8A 00 00 D3 0E 00 00 07 10 00 00 00'), False)
 		stop_trace()
 		stop_bot()
 		reverse_return(3, "Fruchtbarkeitstempel")
@@ -3055,6 +3093,7 @@ def handle_chat(t,player,msg):
 					inject_joymax(0x704C, struct.pack('b',i)+b'\xED\x19\x07\x13\x00\x00\x00', False)
 					return
 	elif ((t == 2 and player == 'Seven') or player == get_character_data()['name']) and msg.lower() == 'tproc':
+		inject_joymax(0x715F, bytes.fromhex('EF 8A 00 00 D3 0E 00 00 07 0A 00 00 00'), False)
 		stop_trace()
 		stop_bot()
 		reverse_return(3, "Herzgipfel") #Wind Town
@@ -3075,6 +3114,7 @@ def handle_chat(t,player,msg):
 		stop_bot()
 		reverse_return(3, "Roter Boden") #Wind Town
 	elif ((t == 2 and player == 'Seven') or player == get_character_data()['name']) and msg.lower() == 'tpcerb':
+		inject_joymax(0x715F, bytes.fromhex('EF 8A 00 00 D3 0E 00 00 07 03 00 00 00'), False)
 		stop_trace()
 		stop_bot()
 		reverse_return(3, "Göttergarten") #Wind Town
@@ -3247,7 +3287,8 @@ stop'''
 		items = get_inventory()['items']
 		for item in items:
 			if item and itemName.upper() in item['name'].upper():
-				phBotChat.Guild(item['name'] + ' [' + str(item['quantity']) + ']')
+				msg = item['name'] + ' [' + str(item['quantity']) + ']'
+				phBotChat.Guild(msg)
 	elif msg.lower() == 'g':
 		log('[Gold] '+str(get_character_data()['gold']))
 	elif msg.lower() == '-g':
