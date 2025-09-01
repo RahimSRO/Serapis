@@ -2957,7 +2957,7 @@ def handle_chat(t,player,msg):
 	global UniqueAlert
 	if msg == '.c':
 		inject_joymax(0x705B, bytearray(), False)
-	elif 'walk':
+	elif 'walk' in msg:
 		log('walk,'+str(round(get_position()['x']))+','+str(round(get_position()['y']))+','+str(round(get_position()['z'])))
 	elif msg == '.q':
 		npcs = get_npcs()
