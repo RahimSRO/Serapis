@@ -149,9 +149,10 @@ def teleported():
 	global PICK
 	global UINT
 	if get_character_data()['name'] == 'Seven':
-		if get_character_data()['region'] == 23603 and get_inventory()['items'][8]:
-			log('23603')
+		if get_character_data()['region'] == 23603 and get_inventory()['items'][8]: #alex north
+			TownSpawn()
 			Timer(1,inject_joymax,[0x705A,bytes.fromhex('04 00 00 00 02 AE 00 00 00'),False]).start()
+			start_bot()
 		LastUniqueInRange = False
 		UINT = False
 		startAfterPick = ''
@@ -176,6 +177,39 @@ def teleported():
 			# Timer(4.5,inject_joymax,[0x7045,struct.pack('I',31),True]).start()
 		Timer(5,inject_joymax,[0xA451, b'\x04', True]).start()
 		return
+	elif get_character_data()['name'] == 'Trump':
+		if get_zone_name(get_position()['region']) == 'Tempel':
+			log('Nos vemos en 2 segundos...')
+			Timer(5,start_bot).start()
+		elif get_position()['region'] == 23088: #Alexandria
+			move_to_trader()
+		elif get_position()['region'] == 23687: #Hotan
+			Timer(1,inject_joymax,[0x705A,bytes.fromhex('01 00 00 00 02 AF 00 00 00'),False]).start()
+		elif get_position()['region'] == 25000: #Jangan
+			stop_bot()
+			Timer(1,inject_joymax,[0x705A,bytes.fromhex('09 00 00 00 02 AF 00 00 00'),False]).start()
+
+
+def move_to_trader():
+	log('move_to_trader')
+	if get_position()['region'] == 23088:
+		x1 = -16639
+		y1 = -303
+		x2 = get_position()['x']
+		y2 = get_position()['y']
+		dis = ((x2-x1)**2+(y2-y1)**2)**1/2
+		if dis > 5:	
+			move_to(x1,y1,0)
+		else:
+			log(str(dis))
+			Dismount()
+		npcs = get_npcs()
+		for id, npc in npcs.items():
+			if "Alexandria" in npc['name']:
+				inject_joymax(0x705A, struct.pack('I',id)+b'\x02\xAD\x00\x00\x00', False) #
+				break	
+		Timer(0.5,move_to_trader).start()
+
 
 def moveToBandit():
 	x1 = 9113
@@ -295,7 +329,7 @@ def easyPick(k=0):
 					break
 	if drops:
 		for dropID in drops:
-			if k != 0 and 'adv' in drops[dropID]['name'].lower():
+			if k != 0 and 'lottery' in drops[dropID]['name'].lower():
 				inject_joymax(0x70C5, struct.pack('I', k) + b'\x08' + struct.pack('I', dropID), False)
 				log(drops[dropID]['name'])
 				Timer(0.3,easyPick,[k]).start()
@@ -309,8 +343,10 @@ def easyPick(k=0):
 				Timer(0.3,easyPick,[k]).start()
 				return
 		for dropID in drops:
-			if k != 0 and 'lottery' in drops[dropID]['name'].lower():
-				inject_joymax(0x70C5, struct.pack('I', k) + b'\x08' + struct.pack('I', dropID), False)
+			if 'poro' in drops[dropID]['name'].lower():
+				if k != 0:
+					inject_joymax(0x70C5, struct.pack('I', k) + b'\x08' + struct.pack('I', dropID), False)
+				# inject_joymax(0x7074, b'\x01\x02\x01' + struct.pack('I', dropID), False)
 				log(drops[dropID]['name'])
 				Timer(0.3,easyPick,[k]).start()
 				return
@@ -397,6 +433,13 @@ def NotEasyPick():
 	drops = get_drops()
 	if drops:
 		for dropID in drops:
+			if 'lottery' in drops[dropID]['name'].lower():
+				verdemini(drops[dropID]['name'])
+				inject_joymax(0x7074, b'\x01\x02\x01' + struct.pack('I', dropID), False)
+				log(drops[dropID]['name'])
+				Timer(0.3,NotEasyPick).start()
+				return
+		for dropID in drops:
 			if 'Gold' in drops[dropID]['name']:
 				verdemini(drops[dropID]['name'])
 				inject_joymax(0x7074, b'\x01\x02\x01' + struct.pack('I', dropID), False)
@@ -424,6 +467,8 @@ def NotEasyPick():
 				log(drops[dropID]['name'])
 				Timer(0.3,NotEasyPick).start()
 				return
+	else:
+		aquamini('No hay mas drops')
 
 def easyPickOLD(k=0):
 	temp = False
@@ -534,15 +579,26 @@ def handle_joymax(opcode, data):
 	if opcode == 0x3040 and len(data) == 23:
 		verdemini(get_item(struct.unpack_from('i', data, 7)[0])['name'])
 	elif opcode == 0x3041 and get_character_data()['player_id'] == struct.unpack_from('I',data,0)[0]:
+		if get_inventory()['items'][8]:
+			return
 		log('Poniendo capa...')
-		# killClient()
+		killClient()
 	elif opcode == 0xB007: #capa no capa
+		log('CAPA NO CAPA: '+str(struct.unpack_from('<I', data, 83)[0]))
+		name = struct.unpack_from('<' + str(data[7]) + 's',data,9)[0].decode('cp1252')
+		if struct.unpack_from('<I', data, 83)[0] == 10722309 and name == 'Trump':
+			QtBind.setText(gui, text, struct.unpack_from('<' + str(data[7]) + 's',data,9)[0].decode('cp1252'))
+			killClient()
+			return
+		if struct.unpack_from('<I', data, 83)[0] == 51076 and name == 'Seven':
+			QtBind.setText(gui, text, struct.unpack_from('<' + str(data[7]) + 's',data,9)[0].decode('cp1252'))
+			killClient()
+			return
 		if dcName and CLIENTLESS_BOL:
 			inject_joymax(0x7001, struct.pack('H', len(dcName)) + dcName.encode('ascii'), True)
 		else:
 			QtBind.setText(gui, text, struct.unpack_from('<' + str(data[7]) + 's',data,9)[0].decode('cp1252'))
 		#QtBind.text(gui,text)
-		log('CAPA NO CAPA: '+str(struct.unpack_from('<I', data, 83)[0]))
 		return True
 		#CHAR_NAME = struct.unpack_from('<' + str(data[7]) + 's',data,9)[0].decode('cp1252')
 	# elif opcode == 0x38F5 and data[0] == 6 and data[5] == 2 and not data[6] and get_guild()[struct.unpack_from("<I", data, 1)[0]]['name'] == "Seven":
@@ -558,6 +614,8 @@ def handle_joymax(opcode, data):
 		if struct.unpack_from('I',data,4)[0] == 2198:#and data == b'\x57\x74\x0E\x00\x96\x08\x00\x00':
 			ScrollUsado = True
 			morado('Scroll')
+			# stop_bot()
+			# set_profile('Uniques')
 			Timer(2,switchScroll).start()
 		elif struct.unpack_from('I',data,4)[0] == 2128:
 			morado('Bandit Scroll')
@@ -584,7 +642,7 @@ def handle_joymax(opcode, data):
 			name = struct.unpack_from('<' + str(data[6]) + 's',data,8)[0].decode('cp1252')
 			mobs = get_monsters()
 			for mobID in mobs:
-				if mobs[mobID]['type'] == 24 and 'Balloon' not in mobs[mobID]['name']:
+				if mobs[mobID]['type'] == 24 and 'Balloon' not in mobs[mobID]['name'] and data in uniques:
 					phBotChat.Party(name + ' Here! => ['+mobs[mobID]['name'] +']')
 					break
 	elif opcode == 0xB070: #medusa
@@ -726,6 +784,8 @@ def handle_joymax(opcode, data):
 					threading.Thread(target=sendTelegram, args=[msg],).start()
 				elif 'balloons' in msg.lower():
 					log(msg)
+				elif 'League of Legends' in msg:
+					threading.Thread(target=sendTelegram, args=[msg],).start()
 		return True
 	elif opcode == 0xB069: #Party Form
 		if data != b'\x02\x1D\x2C' and data != b'\x02\x1B\x2C':
@@ -778,7 +838,17 @@ def handle_joymax(opcode, data):
 		if data[0] == 1:
 			inject_joymax(0x3080,b'\x01\x01',False)
 	elif opcode == 0x30D5: #Kill quest Mob job
-		return True
+		return
+		if struct.unpack_from('H', data, 1)[0] == 1625:
+			if len(data) == 14:
+				log('quest complete!')
+			else:
+				entero = int(QtBind.text(gui,text))
+				log(str(entero))
+				mobs = struct.unpack_from('I', data, entero)[0]
+				if struct.unpack_from('B', data, 9)[0] == 2:
+					log('mob: ' + str(mobs))
+		return
 		if struct.unpack_from('<I', data, 6)[0] == 50401285:
 			log('Priest: ' + str(struct.unpack_from('<I', data, 40)[0]))
 			if struct.unpack_from('<I', data, 40)[0] == 250 and 'Harsa' not in get_training_area()['path']:
@@ -938,7 +1008,7 @@ def spawnPets():
 		return
 	items = get_inventory()['items']
 	for slot, item in enumerate(items):
-		if item and ('Red Dragon' in item['name'] or 'Griffin' in item['name']) and not dragon:
+		if item and ('Red Dragon' in item['name'] or 'Griffin' in item['name'] or 'Dino' in item['name'] or 'Silverback' in item['name']) and not dragon:
 			log('Summoning: '+ item['name'])
 			inject_joymax(0x704C, struct.pack('b',slot)+b'\xCD\x08', True)
 			Timer(0.5,spawnPets).start()
@@ -992,6 +1062,9 @@ def handle_silkroad(opcode,data):
 	if opcode == 0x2002 and checkParty() and ('Verbotene Ebene' == get_zone_name(get_character_data()['region']) or 'Tempel'  == get_zone_name(get_character_data()['region'])):
 		pickWithPet()
 		return True
+	elif opcode == 0x715F: #scroles de la premium
+		stop_bot()
+		set_profile('Uniques')
 	elif opcode == 0xA119: #HWID
 		log('HWID')
 		# log((' '.join('{:02X}'.format(x) for x in data)))
@@ -1008,7 +1081,8 @@ def handle_silkroad(opcode,data):
 		return True
 		EquipUnequip()
 	elif opcode == 0xC00C:
-
+		if get_zone_name(get_character_data()['region']).lower() == 'league of legends':
+			return True
 		#ESTE ERA PARA BUSCAR MERCA
 		if merca:
 			morado('STOP BOT')
@@ -1083,6 +1157,16 @@ def handle_silkroad(opcode,data):
 				start_bot()
 			merca = not merca
 			return False
+		elif data == b'\x6D\x23\x00\x00':
+			morado('Uniques Profile')
+			Party = get_party()
+			if Party:
+				for memberID in Party:
+					if 'Wan' == Party[memberID]['name']:
+						inject_joymax(0x7061, bytearray(), False)
+			stop_bot()
+			set_profile('Uniques')
+			return False
 		elif data == b'\x36\x23\x00\x00':
 			morado('joinParty')
 			joinParty()
@@ -1092,12 +1176,32 @@ def handle_silkroad(opcode,data):
 			morado('Target: General')
 			targetBol = not targetBol
 			targetGeneral()
-		elif data == b'\x29\x23\x00\x00':
+		elif data == b'\x29\x23\x00\x00': #Demon Hideout
+			morado('Quest')
+			stop_bot()
+			stop_trace()
+			set_profile('Quest')
+			npcs = get_npcs()
+			for id, npc in npcs.items():
+				if "SeaFarers Dimensional Gate" in npc['name']:
+					inject_joymax(0x705A, struct.pack('I',id)+b'\x02\xCF\x00\x00\x00', False) #
+					break
+				elif "Hotan" in npc['name']:
+					inject_joymax(0x705A, struct.pack('I',id)+b'\x02\x01\x00\x00\x00', False) #
+					break
+				elif "Donwhang" in npc['name']:
+					inject_joymax(0x705A, struct.pack('I',id)+b'\x02\x01\x00\x00\x00', False) #
+					break
+			Timer(0.5,changeTrainingArea,['Quest4']).start()
+			if get_character_data()['name'] == 'Seven':
+				spawnPickPet()
+			return False
 			#este era para invitar al otro thief al party y crear party match para robar juntos
 			return False
 			partyNumber = 0
 			mihar()
 		elif data == b'\x6E\x23\x00\x00': #socks
+			equipJob()
 			return False
 	elif opcode == 0x3091: #esencia1
 		if data ==  b'\x00':
@@ -1138,9 +1242,15 @@ def handle_silkroad(opcode,data):
 			npcs = get_npcs()
 			for id, npc in npcs.items():
 				if "SeaFarers Dimensional Gate" in npc['name']:
-					inject_joymax(0x705A, struct.pack('I',id)+b'\x02\xCF\x00\x00\x00', False) #DWJG
+					inject_joymax(0x705A, struct.pack('I',id)+b'\x02\xCF\x00\x00\x00', False) #
 					break
-			Timer(0.5,changeTrainingArea,['3mirror']).start()
+				elif "Hotan" in npc['name']:
+					inject_joymax(0x705A, struct.pack('I',id)+b'\x02\x01\x00\x00\x00', False) #
+					break
+				elif "Donwhang" in npc['name']:
+					inject_joymax(0x705A, struct.pack('I',id)+b'\x02\x01\x00\x00\x00', False) #
+					break
+			Timer(0.5,changeTrainingArea,['mirror2']).start()
 			if get_character_data()['name'] == 'Seven':
 				spawnPickPet()
 			return False
@@ -1270,6 +1380,8 @@ def handle_event(t, data):
 				if get_inventory()['items'][8]:
 					threading.Thread(target=sendTelegram, args=[name + ' -> ' + data + zona + xy],).start()
 	elif t == 7:
+		if get_character_data()['name'] == 'Trump':
+			threading.Thread(target=sendTelegram2, args=['Die!']).start()
 		log(data)
 		if NPC:
 			Timer(1, inject_joymax, [0x3053, b'\x01', True]).start()
@@ -1277,7 +1389,7 @@ def handle_event(t, data):
 			Timer(1, inject_joymax, [0x3053, b'\x02', True]).start()
 	elif t == 5:
 		threading.Thread(target=sendTelegram, args=['*'+get_character_data()['name'] + '* -> `'+get_item(int(data))['name']+'`'],).start()
-	elif t == 0 and UniqueAlert and '(INTs)' not in data and 'Apis' not in data and 'Priest of Luck' not in data and 'BeakYung' not in data:
+	elif t == 0 and UniqueAlert and '(INTs)' not in data and 'Apis' not in data and 'Priest of Luck' not in data and 'BeakYung' not in data and get_zone_name(get_character_data()['region']) != 'League Of Legends':
 		if get_character_data()['name'] != 'Seven':
 			phBotChat.Private('Seven',data)
 			UniqueStart = True
@@ -1286,7 +1398,7 @@ def handle_event(t, data):
 		useSpeed()
 		play_wav('Sounds/Unique In Range.wav')
 		notice(data)
-		if partyAlert and data in uniques:
+		if partyAlert and (data in uniques or 'STR'in data or 'INT' in data):
 			phBotChat.Party('Here ---> ['+ data + ']')
 		# cancelAlchemy()
 		if 'Balloon' not in data:
@@ -1342,7 +1454,34 @@ clientlessbtn	= QtBind.createButton(gui,'killClient','Clientless',650,290)
 KillClientCheck = QtBind.createCheckBox(gui,'AutoClientless','Auto Clientless',560,260)
 QtBind.setChecked(gui, KillClientCheck, True)
 
+
+
+temporaleo = 0
 def testinger():
+	move_to_trader()
+	return
+	global temporaleo
+	npcs = get_npcs()
+	for id, npc in npcs.items():
+		if npc['name'] == 'Hunter Union  Representative Kapado':
+			log('xd')
+			Timer(2, inject_joymax,[0x7045, struct.pack('I',id), False]).start() #Seleccionar NPC
+			Timer(2.5, inject_joymax,[0x7046, struct.pack('I',id) + b'\x02', False]).start() #Hablar con NPC
+			Timer(3, inject_joymax,[0x30D4, struct.pack('I',5), False]).start() #Seleccionar Quest Templo
+			Timer(3.5, inject_joymax,[0x30D4, b'\x05', False]).start() #Aceptar
+			temporaleo +=1
+			log(str(temporaleo))
+	# log('walk,'+str(round(get_position()['x']))+','+str(round(get_position()['y']))+','+str(round(get_position()['z'])))
+	return
+	Timer(0, inject_joymax,[0x7045, struct.pack('I',id), False]).start() #Seleccionar NPC
+	Timer(0.5, inject_joymax,[0x7046, struct.pack('I',id) + b'\x02', False]).start() #Hablar con NPC
+	Timer(1, inject_joymax,[0x30D4, b'\x08', False]).start() #Seleccionar Quest Templo
+	Timer(1.5, inject_joymax,[0x30D4, b'\x05', False]).start() #Aceptar
+	drops = get_drops()
+	if drops:
+		for dropID in drops:
+			log(drops[dropID]['name'])
+	return
 	NotEasyPick()
 	log(str(get_drops()))
 	return
@@ -2345,9 +2484,10 @@ def unequipJob():
 
 def equipJob():
 	global partyNumber
-	SAFE_ZONES = [26265,23687,27244,26959,25000,23603,23088]
+	SAFE_ZONES = [26265,23687,27244,26959,25000,23603,23088,23856]
 	if get_character_data()['region'] in SAFE_ZONES:
 		stop_bot()
+		set_profile('Thief')
 		delete_pet()
 		if get_inventory()['items'][8]:
 			return
@@ -2484,9 +2624,9 @@ def Dismount():
 	pets = get_pets()
 	for k, v in pets.items():
 		if v['mounted']:
+			log('Dismounting...')
 			inject_joymax(0x70CB, b'\x00'+struct.pack('I', k), False)
-			return True
-	return True
+			Timer(0.5,Dismount).start()
 
 def TerminatePet():
 	pets = get_pets()
@@ -2816,6 +2956,15 @@ def handle_chat(t,player,msg):
 	global UniqueAlert
 	if msg == '.c':
 		inject_joymax(0x705B, bytearray(), False)
+	elif msg == '.q':
+		npcs = get_npcs()
+		for id, npc in npcs.items():
+			if npc['name'] == 'Hunter Union  Representative Kapado':
+				log('Quest Trader')
+				Timer(2, inject_joymax,[0x7045, struct.pack('I',id), False]).start() #Seleccionar NPC
+				Timer(2.5, inject_joymax,[0x7046, struct.pack('I',id) + b'\x02', False]).start() #Hablar con NPC
+				Timer(3, inject_joymax,[0x30D4, struct.pack('I',5), False]).start() #Seleccionar Quest Templo
+				Timer(3.5, inject_joymax,[0x30D4, b'\x05', False]).start() #Aceptar
 	elif msg == '/z' and get_character_data()['name'] == player:
 		UniqueAlert = not UniqueAlert
 		QtBind.setChecked(gui, UniqueCheck, UniqueAlert)
@@ -2926,6 +3075,7 @@ def handle_chat(t,player,msg):
 	elif msg == 'sort':
 		sort_inventory()
 	elif msg == 'go':
+		return
 		Party = get_party()
 		if Party:
 			for memberID in Party:
@@ -2998,7 +3148,9 @@ def handle_chat(t,player,msg):
 	# 	stop_bot()
 	# 	Timer(3,go_Seven).start()
 	if t == 6 and '[G' in player and get_character_data()['name'] == 'Seven':
-		threading.Thread(target=sendTelegram, args=['`'+player+'`' + " -> " + msg],).start()
+		pass
+		#passatiempo
+		# threading.Thread(target=sendTelegram, args=['`'+player+'`' + " -> " + msg],).start()
 	if t == 2:
 		play_wav('Sounds/PrivateMessage2.wav')
 	if msg.isnumeric():
@@ -3030,44 +3182,52 @@ def handle_chat(t,player,msg):
 		phBotChat.Private(player, str(get_character_data()['region']))
 	if t == 7:
 		log('Noticia: '+msg)
-	elif msg == 'last' and (get_character_data()['name'] == player or player == 'Seven'):
+	elif msg == 'last*' and (get_character_data()['name'] == player or player == 'Seven'):
 		reverse_return(0,'')
-	elif msg == 'death' and (get_character_data()['name'] == player or player == 'Seven'):
+	elif msg == 'death*' and (get_character_data()['name'] == player or player == 'Seven'):
 		reverse_return(1,'')
 	elif ((t == 2 and player == 'Seven') or player == get_character_data()['name']) and msg.lower() == 'tomb':
+		set_profile('Uniques')
 		stop_trace()
 		stop_bot()
 		reverse_return(3, "Seenwald")
 	elif ((t == 2 and player == 'Seven') or player == get_character_data()['name']) and msg.lower() == 'tptg':
 		inject_joymax(0x715F, bytes.fromhex('EF 8A 00 00 D3 0E 00 00 07 1C 00 00 00'), False)
 		stop_trace()
+		set_profile('Uniques')
 		stop_bot()
 		reverse_return(3, "Bandit-Bergfestung")
 	elif ((t == 2 and player == 'Seven') or player == get_character_data()['name']) and msg.lower() == 'tpdemon':
 		stop_trace()
+		set_profile('Uniques')
 		stop_bot()
 		reverse_return(3, "Heart Peak")
 	elif ((t == 2 and player == 'Seven') or player == get_character_data()['name']) and msg.lower() == 'tpuru1':
 		inject_joymax(0x715F, bytes.fromhex('EF 8A 00 00 D3 0E 00 00 07 16 00 00 00'), False)
 		stop_trace()
+		set_profile('Uniques')
 		stop_bot()
 		reverse_return(3, "Black-Robber-Lager")
 	elif ((t == 2 and player == 'Seven') or player == get_character_data()['name']) and msg.lower() == 'tpuru2':
 		stop_trace()
+		set_profile('Uniques')
 		stop_bot()
 		reverse_return(3, "Tarimbecken")
 	elif ((t == 2 and player == 'Seven') or player == get_character_data()['name']) and msg.lower() == 'tplord1':
 		inject_joymax(0x715F, bytes.fromhex('EF 8A 00 00 D3 0E 00 00 07 0E 00 00 00'), False)
 		stop_trace()
+		set_profile('Uniques')
 		stop_bot()
 		reverse_return(3, "Niya-Ruine")
 	elif ((t == 2 and player == 'Seven') or player == get_character_data()['name']) and msg.lower() == 'tplord2':
 		inject_joymax(0x715F, bytes.fromhex('EF 8A 00 00 D3 0E 00 00 07 10 00 00 00'), False)
 		stop_trace()
 		stop_bot()
+		set_profile('Uniques')
 		reverse_return(3, "Fruchtbarkeitstempel")
 	elif ((t == 2 and player == 'Seven') or player == get_character_data()['name']) and msg.lower() == 'tpisy1':
 		stop_trace()
+		set_profile('Uniques')
 		stop_bot()
 		for i,x in enumerate(get_inventory()['items']):
 			if x and i > 13:
@@ -3078,6 +3238,7 @@ def handle_chat(t,player,msg):
 	elif ((t == 2 and player == 'Seven') or player == get_character_data()['name']) and msg.lower() == 'tpisy2':
 		stop_trace()
 		stop_bot()
+		set_profile('Uniques')
 		for i,x in enumerate(get_inventory()['items']):
 			if x and i > 13:
 				if x['name'] == 'Reverse Reverse Return Scroll':
@@ -3086,6 +3247,7 @@ def handle_chat(t,player,msg):
 					return
 	elif ((t == 2 and player == 'Seven') or player == get_character_data()['name']) and msg.lower() == 'tpisy3':
 		stop_trace()
+		set_profile('Uniques')
 		stop_bot()
 		for i,x in enumerate(get_inventory()['items']):
 			if x and i > 13:
@@ -3095,31 +3257,38 @@ def handle_chat(t,player,msg):
 	elif ((t == 2 and player == 'Seven') or player == get_character_data()['name']) and msg.lower() == 'tproc':
 		inject_joymax(0x715F, bytes.fromhex('EF 8A 00 00 D3 0E 00 00 07 0A 00 00 00'), False)
 		stop_trace()
+		set_profile('Uniques')
 		stop_bot()
 		reverse_return(3, "Herzgipfel") #Wind Town
 	elif ((t == 2 and player == 'Seven') or player == get_character_data()['name']) and msg.lower() == 'tproc2':
 		stop_trace()
 		stop_bot()
+		set_profile('Uniques')
 		reverse_return(3, "Windstadt") #Wind Town
 	elif ((t == 2 and player == 'Seven') or player == get_character_data()['name']) and msg.lower() == 'tpivy':
 		stop_trace()
+		set_profile('Uniques')
 		stop_bot()
 		reverse_return(3, "Cleopatra-Tor") #Wind Town
 	elif ((t == 2 and player == 'Seven') or player == get_character_data()['name']) and msg.lower() == 'tpivy2':
 		stop_trace()
+		set_profile('Uniques')
 		stop_bot()
 		reverse_return(3, "Teich-Ruinen") #Wind Town
 	elif ((t == 2 and player == 'Seven') or player == get_character_data()['name']) and msg.lower() == 'tphwt':
 		stop_trace()
+		set_profile('Uniques')
 		stop_bot()
 		reverse_return(3, "Roter Boden") #Wind Town
 	elif ((t == 2 and player == 'Seven') or player == get_character_data()['name']) and msg.lower() == 'tpcerb':
 		inject_joymax(0x715F, bytes.fromhex('EF 8A 00 00 D3 0E 00 00 07 03 00 00 00'), False)
 		stop_trace()
+		set_profile('Uniques')
 		stop_bot()
 		reverse_return(3, "Göttergarten") #Wind Town
 	elif ((t == 2 and player == 'Seven') or player == get_character_data()['name']) and msg.lower() == 'tpred':
 		stop_trace()
+		set_profile('Uniques')
 		stop_bot()
 		for i,x in enumerate(get_inventory()['items']):
 			if x and i > 13:
@@ -3128,14 +3297,17 @@ def handle_chat(t,player,msg):
 					return
 	elif ((t == 2 and player == 'Seven') or player == get_character_data()['name']) and msg.lower() == 'tpforest':
 		stop_trace()
+		set_profile('Uniques')
 		stop_bot()
 		reverse_return(3, "Kummerwald")
 	elif ((t == 2 and player == 'Seven') or player == get_character_data()['name']) and msg.lower() == 'tpsalt':
 		stop_trace()
+		set_profile('Uniques')
 		stop_bot()
 		reverse_return(3, "Salz-Posten")
 	elif ((t == 2 and player == 'Seven') or player == get_character_data()['name']) and msg.lower() == 'tpb4':
 		stop_trace()
+		set_profile('Uniques')
 		stop_bot()
 		for i,x in enumerate(get_inventory()['items']):
 			if x and i > 13:
@@ -3360,6 +3532,7 @@ stop'''
 		inject_joymax(0x3053, b'\x01', False)
 	elif msg.lower() == 'zona':
 		log(get_zone_name(get_position()['region']))
+		log(str(get_position()['region']))
 	elif msg.lower() == 'region':
 		log('la region es: '+str(get_position()['region']))
 	elif msg.lower() == 'petoff':
@@ -3400,7 +3573,7 @@ stop'''
 		dropg = False
 		PICK = False
 		merca = False
-	elif msg.lower() == 'here':
+	elif msg.lower() == 'here' and t == 1:
 		log('dijo here en all')
 		stop_bot()
 		stop_trace()
@@ -3937,4 +4110,4 @@ def ChangeBotOption(args,reload):
 					reload_profile()
 				return 0
 
-log('[%s] Loaded v1.0' % __name__)
+log('[%s] Loaded v1.2' % __name__)
