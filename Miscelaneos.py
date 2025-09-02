@@ -65,7 +65,7 @@ def cancelAlchemy():
 traders = ['Cuantica','Trump','Zet','Dot','Fin']
 
 def traderINtown(s=1):
-	urllib.request.urlopen('https://api.telegram.org/bot6863881576:AAHQ34H1cMzGz8XsNf5SqiCkY2wQ-dpBBG4/sendMessage?chat_id=149273661&parse_mode=Markdown&text=TOWN%20%20`'+get_character_data()['name']+'`',context=ssl._create_unverified_context())
+	urllib.request.urlopen('https://api.telegram.org/bot6863881576:AAEUqXN94muylVUiX-HmLyv-_9aX_UMSCVg/sendMessage?chat_id=149273661&parse_mode=Markdown&text=TOWN%20%20`'+get_character_data()['name']+'`',context=ssl._create_unverified_context())
 	return True
 
 def disconnected():
@@ -151,8 +151,12 @@ def teleported():
 	if get_character_data()['name'] == 'Seven':
 		if get_character_data()['region'] == 23603 and get_inventory()['items'][8]: #alex north
 			TownSpawn()
+			stop_bot()
 			Timer(1,inject_joymax,[0x705A,bytes.fromhex('04 00 00 00 02 AE 00 00 00'),False]).start()
-			start_bot()
+			# start_bot()
+		if get_position()['region'] == -32752: #Tempel
+			log('Nos vemos en 2 segundos...')
+			Timer(5,start_bot).start()
 		LastUniqueInRange = False
 		UINT = False
 		startAfterPick = ''
@@ -181,11 +185,11 @@ def teleported():
 		if get_zone_name(get_position()['region']) == 'Tempel':
 			log('Nos vemos en 2 segundos...')
 			Timer(5,start_bot).start()
-		elif get_position()['region'] == 23088: #Alexandria
+		elif get_position()['region'] == 23088 and get_inventory()[8]: #Alexandria
 			move_to_trader()
-		elif get_position()['region'] == 23687: #Hotan
+		elif get_position()['region'] == 23687 and get_inventory()[8]: #Hotan
 			Timer(1,inject_joymax,[0x705A,bytes.fromhex('01 00 00 00 02 AF 00 00 00'),False]).start()
-		elif get_position()['region'] == 25000: #Jangan
+		elif get_position()['region'] == 25000 and get_inventory()[8]: #Jangan
 			stop_bot()
 			Timer(1,inject_joymax,[0x705A,bytes.fromhex('09 00 00 00 02 AF 00 00 00'),False]).start()
 
@@ -1250,7 +1254,7 @@ def handle_silkroad(opcode,data):
 				elif "Donwhang" in npc['name']:
 					inject_joymax(0x705A, struct.pack('I',id)+b'\x02\x01\x00\x00\x00', False) #
 					break
-			Timer(0.5,changeTrainingArea,['mirror2']).start()
+			Timer(0.5,changeTrainingArea,['0quest']).start()
 			if get_character_data()['name'] == 'Seven':
 				spawnPickPet()
 			return False
@@ -1454,10 +1458,25 @@ clientlessbtn	= QtBind.createButton(gui,'killClient','Clientless',650,290)
 KillClientCheck = QtBind.createCheckBox(gui,'AutoClientless','Auto Clientless',560,260)
 QtBind.setChecked(gui, KillClientCheck, True)
 
+def PathMaker():
+	msg = QtBind.text(gui,XY)
+	splited = msg.split(',')
+	region = int(splited[0])
+	x = int(splited[1])
+	y = int(splited[2])
+	z = int(splited[3])
+	path = generate_script(region,x,y,z)
+	file = open(QtBind.text(gui,scriptName)+'.txt','w')
+	for k in path:
+		# s = 'walk,'+str(k[0])+','+str(k[1])+",0\n"
+		file.write(k+"\n")
+	file.close()
+	log('Listo el script')
 
-
-temporaleo = 0
 def testinger():
+	# QtBind.setText(gui, XY, str(int(get_position()['region']))+','+str(int(get_position()['x']))+','+str(int(get_position()['y']))+','+str(int(get_position()['z'])))
+	PathtMaker()
+	return
 	log(str(get_training_area()))
 	move_to_trader()
 	return
@@ -3077,8 +3096,7 @@ def handle_chat(t,player,msg):
 		crystal()
 	elif msg == 'sort':
 		sort_inventory()
-	elif msg == 'go':
-		return
+	elif msg == 'go*':
 		Party = get_party()
 		if Party:
 			for memberID in Party:
@@ -3835,15 +3853,20 @@ labelName = QtBind.createLabel(gui,'Nombre:',370,180)
 scriptName = QtBind.createLineEdit(gui,"Scripts/",425,176,150,20)
 labelXY = QtBind.createLabel(gui,'x,y',363,147)
 XY = QtBind.createLineEdit(gui,"3548,2085",380,145,120,20)
-MakeScript = QtBind.createButton(gui,'ScriptMaker',"MakeScript",410,220)
-GetPosition = QtBind.createButton(gui,'GetPosition',"GetPosition",510,220)
+MakeScript = QtBind.createButton(gui,'ScriptMaker',"ScriptMaker",410,220)
+MakePath = QtBind.createButton(gui,'PathMaker',"PathMaker",410,240)
+GetPosition = QtBind.createButton(gui,'GetPos',"GetPos",510,220)
+GetPosition = QtBind.createButton(gui,'GetPosition',"GetPosition",510,240)
 
 uniqueSTRname = QtBind.createLineEdit(gui,"",325,276,80,20)
 configName = QtBind.createLineEdit(gui,"Akeru",420,276,80,20)
 
-def GetPosition():
+def GetPos():
 	QtBind.setText(gui, XY, str(int(get_position()['x']))+','+str(int(get_position()['y'])))
 
+def GetPosition():
+	QtBind.setText(gui, XY, str(int(get_position()['region']))+','+str(int(get_position()['x']))+','+str(int(get_position()['y']))+','+str(int(get_position()['z'])))
+	
 def ScriptMaker():
 	msg = QtBind.text(gui,XY)
 	x = float(msg[:msg.find(',')])
@@ -4113,4 +4136,4 @@ def ChangeBotOption(args,reload):
 					reload_profile()
 				return 0
 
-log('[%s] Loaded v1.2' % __name__)
+log('[%s] Loaded v1.3' % __name__)
