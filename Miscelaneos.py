@@ -823,7 +823,7 @@ def handle_joymax(opcode, data):
 			if UINT:
 				cancelAlchemy()
 		elif data[0] == 6:
-			if get_character_data()['region'] != 25037:
+			if get_character_data()['region'] != 25037 and get_position()['region'] != -32752 and get_position()['region'] != 24268:
 				easyPick()
 				NotEasyPick()
 			name = str(data[8:])[2:-1]
