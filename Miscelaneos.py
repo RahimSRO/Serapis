@@ -46,7 +46,7 @@ def point(x1,y1):
 mobAtacked = []
 myPlayers = ['Seven','Zoser','Trump','Cuantica','Amor','Paz','Yeico','Sol','Amanda','Rah','How']
 itemList = ['advanced','sharpness','lottery','silk scroll','immortal','lucky','poro','sabakun','coin','blue stone','black stone','serapis','pop','reverse','global','gold','carnival']
-itemListAzul = ['advanced','sharpness','lottery','silk scroll','immortal','lucky','poro','sabakun','coin','blue stone','black stone','serapis','carnival']
+itemListAzul = ['advanced','sharpness','lottery','silk scroll','of immortal','lucky','poro','sabakun','coin','blue stone','black stone','serapis','carnival']
 otrosItems = ['Reverse Reverse Return Scroll','Global chatting','Magic POP Card']
 attackWolf = False
 mercaPos = []
@@ -181,17 +181,17 @@ def teleported():
 			# Timer(4.5,inject_joymax,[0x7045,struct.pack('I',31),True]).start()
 		Timer(5,inject_joymax,[0xA451, b'\x04', True]).start()
 		return
-	elif get_character_data()['name'] == 'Trump':
-		if get_zone_name(get_position()['region']) == 'Tempel':
-			log('Nos vemos en 2 segundos...')
-			Timer(5,start_bot).start()
-		elif get_position()['region'] == 23088 and get_inventory()[8]: #Alexandria
-			move_to_trader()
-		elif get_position()['region'] == 23687 and get_inventory()[8]: #Hotan
-			Timer(1,inject_joymax,[0x705A,bytes.fromhex('01 00 00 00 02 AF 00 00 00'),False]).start()
-		elif get_position()['region'] == 25000 and get_inventory()[8]: #Jangan
-			stop_bot()
-			Timer(1,inject_joymax,[0x705A,bytes.fromhex('09 00 00 00 02 AF 00 00 00'),False]).start()
+	# elif get_character_data()['name'] == 'Trump':
+	# 	if get_zone_name(get_position()['region']) == 'Tempel':
+	# 		log('Nos vemos en 2 segundos...')
+	# 		Timer(5,start_bot).start()
+	# 	elif get_position()['region'] == 23088 and get_inventory()['items'][8]: #Alexandria
+	# 		move_to_trader()
+	# 	elif get_position()['region'] == 23687 and get_inventory()['items'][8]: #Hotan
+	# 		Timer(1,inject_joymax,[0x705A,bytes.fromhex('01 00 00 00 02 AF 00 00 00'),False]).start()
+	# 	elif get_position()['region'] == 25000 and get_inventory()['items'][8]: #Jangan
+	# 		stop_bot()
+	# 		Timer(1,inject_joymax,[0x705A,bytes.fromhex('09 00 00 00 02 AF 00 00 00'),False]).start()
 
 
 def move_to_trader():
@@ -323,7 +323,11 @@ def dropItem(name):
 eventos = ['Lucky','Bargain']
 stats = True
 
+normal_log = []
+verde_log = []
+
 def easyPick(k=0):
+	global normal_log
 	drops = get_drops()
 	if k == 0:
 		pets = get_pets()
@@ -333,142 +337,179 @@ def easyPick(k=0):
 					break
 	if drops:
 		for dropID in drops:
-			if k != 0 and 'lottery' in drops[dropID]['name'].lower():
+			if k != 0 and 'lottery' in drops[dropID]['name'].lower() and drops[dropID]['can_pick']:
 				inject_joymax(0x70C5, struct.pack('I', k) + b'\x08' + struct.pack('I', dropID), False)
-				log(drops[dropID]['name'])
+				if dropID not in normal_log:
+					normal_log.append(dropID)
+					log(drops[dropID]['name'])
 				Timer(0.3,easyPick,[k]).start()
 				return
 		for dropID in drops:
-			if 'immortal' in drops[dropID]['name'].lower():
+			if 'immortal' in drops[dropID]['name'].lower() and drops[dropID]['can_pick']:
 				if k != 0:
 					inject_joymax(0x70C5, struct.pack('I', k) + b'\x08' + struct.pack('I', dropID), False)
 				# inject_joymax(0x7074, b'\x01\x02\x01' + struct.pack('I', dropID), False)
-				log(drops[dropID]['name'])
+				if dropID not in normal_log:
+					normal_log.append(dropID)
+					log(drops[dropID]['name'])
 				Timer(0.3,easyPick,[k]).start()
 				return
 		for dropID in drops:
-			if 'poro' in drops[dropID]['name'].lower():
+			if 'poro' in drops[dropID]['name'].lower() and drops[dropID]['can_pick']:
 				if k != 0:
 					inject_joymax(0x70C5, struct.pack('I', k) + b'\x08' + struct.pack('I', dropID), False)
 				# inject_joymax(0x7074, b'\x01\x02\x01' + struct.pack('I', dropID), False)
-				log(drops[dropID]['name'])
+				if dropID not in normal_log:
+					normal_log.append(dropID)
+					log(drops[dropID]['name'])
 				Timer(0.3,easyPick,[k]).start()
 				return
 		for dropID in drops:
-			if 'silk' in drops[dropID]['name'].lower():
+			if 'silk' in drops[dropID]['name'].lower() and drops[dropID]['can_pick']:
 				if k != 0:
 					inject_joymax(0x70C5, struct.pack('I', k) + b'\x08' + struct.pack('I', dropID), False)
 				# inject_joymax(0x7074, b'\x01\x02\x01' + struct.pack('I', dropID), False)
-				log(drops[dropID]['name'])
+				if dropID not in normal_log:
+					normal_log.append(dropID)
+					log(drops[dropID]['name'])
 				Timer(0.3,easyPick,[k]).start()
 				return
 		for dropID in drops:
-			if 'pop' in drops[dropID]['name'].lower():
+			if 'pop' in drops[dropID]['name'].lower() and drops[dropID]['can_pick']:
 				if k != 0:
 					inject_joymax(0x70C5, struct.pack('I', k) + b'\x08' + struct.pack('I', dropID), False)
 				# inject_joymax(0x7074, b'\x01\x02\x01' + struct.pack('I', dropID), False)
-				log(drops[dropID]['name'])
+				if dropID not in normal_log:
+					normal_log.append(dropID)
+					log(drops[dropID]['name'])
 				Timer(0.3,easyPick,[k]).start()
 				return
 		for dropID in drops:
-			if k != 0 and 'poro' in drops[dropID]['name'].lower():
+			if k != 0 and 'poro' in drops[dropID]['name'].lower() and drops[dropID]['can_pick']:
 				inject_joymax(0x70C5, struct.pack('I', k) + b'\x08' + struct.pack('I', dropID), False)
-				log(drops[dropID]['name'])
+				if dropID not in normal_log:
+					normal_log.append(dropID)
+					log(drops[dropID]['name'])
 				Timer(0.3,easyPick,[k]).start()
 				return
 		for dropID in drops:
-			if 'arena' in drops[dropID]['name'].lower():
+			if 'arena' in drops[dropID]['name'].lower() and drops[dropID]['can_pick']:
 				if k != 0:
 					inject_joymax(0x70C5, struct.pack('I', k) + b'\x08' + struct.pack('I', dropID), False)
 				# inject_joymax(0x7074, b'\x01\x02\x01' + struct.pack('I', dropID), False)
-				log(drops[dropID]['name'])
+				if dropID not in normal_log:
+					normal_log.append(dropID)
+					log(drops[dropID]['name'])
 				Timer(0.3,easyPick,[k]).start()
 				return
 		for dropID in drops:
-			if 'reverse' in drops[dropID]['name'].lower():
+			if 'reverse' in drops[dropID]['name'].lower() and drops[dropID]['can_pick']:
 				if k != 0:
 					inject_joymax(0x70C5, struct.pack('I', k) + b'\x08' + struct.pack('I', dropID), False)
 				#inject_joymax(0x7074, b'\x01\x02\x01' + struct.pack('I', dropID), False)
-				log(drops[dropID]['name'])
+				if dropID not in normal_log:
+					normal_log.append(dropID)
+					log(drops[dropID]['name'])
 				Timer(0.3,easyPick,[k]).start()
 				return
 		for dropID in drops:
-			if 'carnival' in drops[dropID]['name'].lower():
+			if 'carnival' in drops[dropID]['name'].lower() and drops[dropID]['can_pick']:
 				if k != 0:
 					inject_joymax(0x70C5, struct.pack('I', k) + b'\x08' + struct.pack('I', dropID), False)
 				# inject_joymax(0x7074, b'\x01\x02\x01' + struct.pack('I', dropID), False)
-				log(drops[dropID]['name'])
+				if dropID not in normal_log:
+					normal_log.append(dropID)
+					log(drops[dropID]['name'])
 				Timer(0.3,easyPick,[k]).start()
 				return
 		for dropID in drops:
-			if 'repair' in drops[dropID]['name'].lower():
+			if 'repair' in drops[dropID]['name'].lower() and drops[dropID]['can_pick']:
 				if k != 0:
 					inject_joymax(0x70C5, struct.pack('I', k) + b'\x08' + struct.pack('I', dropID), False)
 				# inject_joymax(0x7074, b'\x01\x02\x01' + struct.pack('I', dropID), False)
-				log(drops[dropID]['name'])
+				if dropID not in normal_log:
+					normal_log.append(dropID)
+					log(drops[dropID]['name'])
 				Timer(0.3,easyPick,[k]).start()
 				return
 		for dropID in drops:
-			if 'stepflare' in drops[dropID]['name'].lower():
+			if 'stepflare' in drops[dropID]['name'].lower() and drops[dropID]['can_pick']:
 				if k != 0:
 					inject_joymax(0x70C5, struct.pack('I', k) + b'\x08' + struct.pack('I', dropID), False)
 				# inject_joymax(0x7074, b'\x01\x02\x01' + struct.pack('I', dropID), False)
-				log( drops[dropID]['name'])
+				if dropID not in normal_log:
+					normal_log.append(dropID)
+					log(drops[dropID]['name'])
 				Timer(0.3,easyPick,[k]).start()
 				return
 		for dropID in drops:
-			if 'global' in drops[dropID]['name'].lower():
+			if 'global' in drops[dropID]['name'].lower() and drops[dropID]['can_pick']:
 				if k != 0:
 					inject_joymax(0x70C5, struct.pack('I', k) + b'\x08' + struct.pack('I', dropID), False)
 				# inject_joymax(0x7074, b'\x01\x02\x01' + struct.pack('I', dropID), False)
-				log(drops[dropID]['name'])
+				if dropID not in normal_log:
+					normal_log.append(dropID)
+					log(drops[dropID]['name'])
 				Timer(0.3,easyPick,[k]).start()
 				return
 		for dropID in drops:
-			if 'gold' in drops[dropID]['name'].lower():
+			if 'gold' in drops[dropID]['name'].lower() and drops[dropID]['can_pick']:
 				if k != 0:
 					inject_joymax(0x70C5, struct.pack('I', k) + b'\x08' + struct.pack('I', dropID), False)
-				log(drops[dropID]['name'])
+				if dropID not in normal_log:
+					normal_log.append(dropID)
+					log(drops[dropID]['name'])
 				Timer(0.3,easyPick,[k]).start()
 				return
 				return
 
 def NotEasyPick():
+	global verde_log
 	drops = get_drops()
 	if drops:
 		for dropID in drops:
-			if 'lottery' in drops[dropID]['name'].lower():
+			if 'lottery' in drops[dropID]['name'].lower() and drops[dropID]['can_pick']:
 				verdemini(drops[dropID]['name'])
 				inject_joymax(0x7074, b'\x01\x02\x01' + struct.pack('I', dropID), False)
-				log(drops[dropID]['name'])
+				if dropID not in normal_log:
+					verde_log.append(dropID)
+					log(drops[dropID]['name'])
 				Timer(0.3,NotEasyPick).start()
 				return
 		for dropID in drops:
-			if 'Gold' in drops[dropID]['name']:
+			if 'Gold' in drops[dropID]['name'] and drops[dropID]['can_pick']:
 				verdemini(drops[dropID]['name'])
 				inject_joymax(0x7074, b'\x01\x02\x01' + struct.pack('I', dropID), False)
-				log(drops[dropID]['name'])
+				if dropID not in normal_log:
+					verde_log.append(dropID)
+					log(drops[dropID]['name'])
 				Timer(0.3,NotEasyPick).start()
 				return
 		for dropID in drops:
-			if 'global' in drops[dropID]['name'].lower():
+			if 'global' in drops[dropID]['name'].lower() and drops[dropID]['can_pick']:
 				verdemini(drops[dropID]['name'])
 				inject_joymax(0x7074, b'\x01\x02\x01' + struct.pack('I', dropID), False)
-				log(drops[dropID]['name'])
+				if dropID not in normal_log:
+					verde_log.append(dropID)
+					log(drops[dropID]['name'])
 				Timer(0.3,NotEasyPick).start()
 				return
 		for dropID in drops:
-			if 'repair' in drops[dropID]['name'].lower():
+			if 'repair' in drops[dropID]['name'].lower() and drops[dropID]['can_pick']:
 				verdemini(drops[dropID]['name'])
 				inject_joymax(0x7074, b'\x01\x02\x01' + struct.pack('I', dropID), False)
-				log(drops[dropID]['name'])
+				if dropID not in normal_log:
+					verde_log.append(dropID)
+					log(drops[dropID]['name'])
 				Timer(0.3,NotEasyPick).start()
 				return
 		for dropID in drops:
-			if 'reverse' in drops[dropID]['name'].lower():
+			if 'reverse' in drops[dropID]['name'].lower() and drops[dropID]['can_pick']:
 				verdemini(drops[dropID]['name'])
 				inject_joymax(0x7074, b'\x01\x02\x01' + struct.pack('I', dropID), False)
-				log(drops[dropID]['name'])
+				if dropID not in normal_log:
+					verde_log.append(dropID)
+					log(drops[dropID]['name'])
 				Timer(0.3,NotEasyPick).start()
 				return
 	else:
@@ -590,6 +631,9 @@ def handle_joymax(opcode, data):
 	elif opcode == 0xB007: #capa no capa
 		log('CAPA NO CAPA: '+str(struct.unpack_from('<I', data, 83)[0]))
 		name = struct.unpack_from('<' + str(data[7]) + 's',data,9)[0].decode('cp1252')
+		if name != 'Seven':
+			killClient()
+			return
 		if struct.unpack_from('<I', data, 83)[0] == 10722309 and name == 'Trump':
 			QtBind.setText(gui, text, struct.unpack_from('<' + str(data[7]) + 's',data,9)[0].decode('cp1252'))
 			killClient()
@@ -842,7 +886,7 @@ def handle_joymax(opcode, data):
 		if data[0] == 1:
 			inject_joymax(0x3080,b'\x01\x01',False)
 	elif opcode == 0x30D5: #Kill quest Mob job
-		return
+		return True
 		if struct.unpack_from('H', data, 1)[0] == 1625:
 			if len(data) == 14:
 				log('quest complete!')
@@ -1254,7 +1298,7 @@ def handle_silkroad(opcode,data):
 				elif "Donwhang" in npc['name']:
 					inject_joymax(0x705A, struct.pack('I',id)+b'\x02\x01\x00\x00\x00', False) #
 					break
-			Timer(0.5,changeTrainingArea,['0quest']).start()
+			Timer(0.5,changeTrainingArea,['Immortal Beak']).start()
 			if get_character_data()['name'] == 'Seven':
 				spawnPickPet()
 			return False
@@ -1458,22 +1502,26 @@ clientlessbtn	= QtBind.createButton(gui,'killClient','Clientless',650,290)
 KillClientCheck = QtBind.createCheckBox(gui,'AutoClientless','Auto Clientless',560,260)
 QtBind.setChecked(gui, KillClientCheck, True)
 
-def PathMaker():
-	msg = QtBind.text(gui,XY)
-	splited = msg.split(',')
-	region = int(splited[0])
-	x = int(splited[1])
-	y = int(splited[2])
-	z = int(splited[3])
-	path = generate_script(region,x,y,z)
-	file = open(QtBind.text(gui,scriptName)+'.txt','w')
-	for k in path:
-		# s = 'walk,'+str(k[0])+','+str(k[1])+",0\n"
-		file.write(k+"\n")
-	file.close()
-	log('Listo el script')
-
 def testinger():
+	log(str(get_drops()))
+	return
+	script = 'C:/Users/User/AppData/Local/Programs/phBot Testing/Scripts/'+QtBind.text(gui,text)+'.txt'
+	args = ['none',script,'Lure','AutoLureScript']
+	ChangeBotOption(args,True)
+	args = ['none',True,'Lure','UseLureScript']
+	Timer(2,ChangeBotOption,[args,True]).start()
+	return
+	log(str(get_training_area()))
+	recovery = 0
+	abnormal = 0
+	for i,item in enumerate(get_inventory()['items']):
+		if item and i>12 and item['name'] == 'Recovery Kit (x-large)':
+			recovery += item['quantity']
+		elif item and i>12 and item['name'] == 'Abnormal State Recovery Potion (medium)':
+			abnormal += item['quantity']
+	log(f'recovery: {recovery}')
+	log(f'abnormal: {abnormal}')
+	return
 	# QtBind.setText(gui, XY, str(int(get_position()['region']))+','+str(int(get_position()['x']))+','+str(int(get_position()['y']))+','+str(int(get_position()['z'])))
 	PathtMaker()
 	return
@@ -1512,6 +1560,22 @@ def testinger():
 	log(f'{player_id}')
 	message = 'Mensaje de prueba'
 	green(message)
+
+def PathMaker():
+	msg = QtBind.text(gui,XY)
+	splited = msg.split(',')
+	region = int(splited[0])
+	x = int(splited[1])
+	y = int(splited[2])
+	z = int(splited[3])
+	path = generate_script(region,x,y,z)
+	file = open(QtBind.text(gui,scriptName)+'.txt','w')
+	for k in path:
+		# s = 'walk,'+str(k[0])+','+str(k[1])+",0\n"
+		file.write(k+"\n")
+	file.close()
+	log('Listo el script')
+
 
 def alejare():
 	stop_bot()
@@ -2689,7 +2753,7 @@ def spawnThiefPet():
 				Packet.append(0x11)
 				inject_joymax(0x704C, Packet, True)
 				return
-			elif len(get_drops()) > 9 and (item['name'] == 'Donkey' or 'elephant' in item['name'].lower()):
+			elif len(get_drops()) > 9 and (item['name'] == 'Donkey' or 'elephant' in item['name'].lower() or 'lizard' in item['name'].lower()):
 				log('Summoning: '+ item['name'])
 				Packet = bytearray()
 				Packet.append(slot)
@@ -2976,6 +3040,12 @@ def handle_chat(t,player,msg):
 	global UniqueAlert
 	if msg == '.c':
 		inject_joymax(0x705B, bytearray(), False)
+	elif msg[0:2] == '@@':
+		script = 'C:/Users/User/AppData/Local/Programs/phBot Testing/Scripts/'+msg[2:]+'.txt'
+		args = ['none',script,'Lure','AutoLureScript']
+		ChangeBotOption(args,True)
+		args = ['none',True,'Lure','UseLureScript']
+		Timer(2,ChangeBotOption,[args,True]).start()
 	elif 'walk' in msg:
 		log('walk,'+str(round(get_position()['x']))+','+str(round(get_position()['y']))+','+str(round(get_position()['z'])))
 	elif msg == '.q':
