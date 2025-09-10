@@ -3120,15 +3120,15 @@ def handle_chat(t,player,msg):
 		phBotChat.Private(splited[1],splited2[1][1:])
 	elif '/g' in msg:
 		splited = msg.split()
-		splited2 = msg.split(splited[1])
+		splited2 = msg.split(splited[0])
 		phBotChat.Guild(splited2[1][1:])
 	elif '/pt' in msg:
 		splited = msg.split()
-		splited2 = msg.split(splited[1])
+		splited2 = msg.split(splited[0])
 		phBotChat.Party(splited2[1][1:])
 	elif '/all' in msg:
 		splited = msg.split()
-		splited2 = msg.split(splited[1])
+		splited2 = msg.split(splited[0])
 		phBotChat.All(splited2[1][1:])
 	elif msg == 'down!' and (get_character_data()['name'] == player or player == 'Seven'):
 		update_plugin()
@@ -4276,4 +4276,4 @@ def ChangeBotOption(args,reload):
 					reload_profile()
 				return 0
 
-log('[%s] Loaded v1.3' % __name__)
+log('[%s] Loaded v1.4' % __name__)
