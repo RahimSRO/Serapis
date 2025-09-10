@@ -1,23 +1,24 @@
 # log((' '.join('{:02X}'.format(x) for x in data)))
-from phBot import *
 import struct
 import QtBind
 import threading
-from threading import Timer
 import phBotChat
 import os
-from time import sleep
 import urllib.request
 import random
 import signal
 import ssl
 import subprocess
 import sys
-from math import pi, cos, sin
-from random import random
 import ctypes
 import re
 import json
+import subprocess
+from phBot import *
+from threading import Timer
+from math import pi, cos, sin
+from random import random
+from time import sleep
 from urllib.request import urlopen
 
 ScrollUsado = False
@@ -139,6 +140,17 @@ def talkToBandit():
 			# Timer(1.5,inject_joymax,[0x7046, struct.pack('I',id)+b'\x0C',True]).start()
 			return True
 
+def move_jangan():
+	if get_position()['region'] == 25000:
+		x1 = 6424
+		y1 = 1095
+		move_to(x1,y1,-32)
+		x2 = get_position()['x']
+		y2 = get_position()['y']
+		dis = ((x2-x1)**2+(y2-y1)**2)**1/2
+		if dis > 5:
+			Timer(0.5,move_jangan).start()
+
 def teleported():
 	log(get_zone_name(get_character_data()['region']))
 	global LastUniqueInRange
@@ -154,9 +166,11 @@ def teleported():
 			stop_bot()
 			Timer(1,inject_joymax,[0x705A,bytes.fromhex('04 00 00 00 02 AE 00 00 00'),False]).start()
 			# start_bot()
-		if get_position()['region'] == -32752: #Tempel
+		elif get_position()['region'] == -32752: #Tempel
 			log('Nos vemos en 2 segundos...')
 			Timer(5,start_bot).start()
+		elif get_position()['region'] == 25000: #Jangan
+			move_jangan()
 		LastUniqueInRange = False
 		UINT = False
 		startAfterPick = ''
@@ -631,7 +645,7 @@ def handle_joymax(opcode, data):
 	elif opcode == 0xB007: #capa no capa
 		log('CAPA NO CAPA: '+str(struct.unpack_from('<I', data, 83)[0]))
 		name = struct.unpack_from('<' + str(data[7]) + 's',data,9)[0].decode('cp1252')
-		if name != 'Seven':
+		if name != 'Seven' and CLIENTLESS_BOL:
 			killClient()
 			return
 		if struct.unpack_from('<I', data, 83)[0] == 10722309 and name == 'Trump':
@@ -738,8 +752,10 @@ def handle_joymax(opcode, data):
 							log(str(mobAtacked))
 							return True
 	elif opcode == 0xB034 and len(data) > 11:
-		# if len(data) == 7:
-		# 	log((' '.join('{:02X}'.format(x) for x in data)))
+		if get_zone_name(get_character_data()['region']).lower() == 'league of legends':
+			if struct.unpack_from('I', data, 8)[0] == 24667:
+				# sort_inventory()
+				log((' '.join('{:02X}'.format(x) for x in data)))
 		if struct.unpack_from('h', data, 0)[0] == 3585:
 			log('ITEM GANADOOOOO: '+get_item(struct.unpack_from('I', data, 8)[0])['name'])
 			if struct.unpack_from('I', data, 8)[0] == 23357 or struct.unpack_from('I', data, 8)[0] == 5920:
@@ -868,8 +884,9 @@ def handle_joymax(opcode, data):
 				cancelAlchemy()
 		elif data[0] == 6:
 			if get_character_data()['region'] != 25037 and get_position()['region'] != -32752 and get_position()['region'] != 24268:
-				easyPick()
-				NotEasyPick()
+				if get_zone_name(get_character_data()['region']) != 'Spiegeldimension':
+					easyPick()
+					NotEasyPick()
 			name = str(data[8:])[2:-1]
 			log(name + ' Killed  -> '+ get_monster(struct.unpack_from('<I', data, 2)[0])['name'])
 			if QtBind.text(gui,uniqueSTRname) != '' and QtBind.text(gui,uniqueSTRname).lower() in get_monster(struct.unpack_from('<I', data, 2)[0])['name'].lower():
@@ -1038,6 +1055,11 @@ def spawnPickPet():
 			inject_joymax(0x704C, struct.pack('b',slot)+b'\xCD\x10', True)
 			Timer(0.5,spawnPickPet).start()
 			return
+		elif item and 'Wasserpanda' in item['name']:
+			log('Summoning: '+ item['name'])
+			inject_joymax(0x704C, struct.pack('b',slot)+b'\xCD\x10', True)
+			Timer(0.5,spawnPickPet).start()
+			return
 
 def spawnPets():
 	verdemini('Spawmiando pets...')
@@ -1070,6 +1092,11 @@ def spawnPets():
 			log('Summoning: '+ item['name'])
 			inject_joymax(0x704C, struct.pack('b',slot)+b'\xCD\x10', True)
 			Timer(0.5,spawnPets).start()
+			return
+		elif item and 'Wasserpanda' in item['name']:
+			log('Summoning: '+ item['name'])
+			inject_joymax(0x704C, struct.pack('b',slot)+b'\xCD\x10', True)
+			Timer(0.5,spawnPickPet).start()
 			return
 
 def pickSpecialReturnScroll():
@@ -1287,20 +1314,10 @@ def handle_silkroad(opcode,data):
 			stop_bot()
 			stop_trace()
 			set_profile('1')
-			npcs = get_npcs()
-			for id, npc in npcs.items():
-				if "SeaFarers Dimensional Gate" in npc['name']:
-					inject_joymax(0x705A, struct.pack('I',id)+b'\x02\xCF\x00\x00\x00', False) #
-					break
-				elif "Hotan" in npc['name']:
-					inject_joymax(0x705A, struct.pack('I',id)+b'\x02\x01\x00\x00\x00', False) #
-					break
-				elif "Donwhang" in npc['name']:
-					inject_joymax(0x705A, struct.pack('I',id)+b'\x02\x01\x00\x00\x00', False) #
-					break
-			Timer(0.5,changeTrainingArea,['Immortal Beak']).start()
+			Timer(0.5,changeTrainingArea,['Modify']).start()
+			telepor()
 			if get_character_data()['name'] == 'Seven':
-				spawnPickPet()
+				spawnPets()
 			return False
 			#Pick trade goods
 			set_training_position(0,0,0,0)
@@ -1337,6 +1354,28 @@ def handle_silkroad(opcode,data):
 		useEnergy()
 		return False
 	return True
+
+def telepor():
+	log('telepor')
+	ciudades = [25000,26265,23687]
+	if get_position()['region'] in ciudades:
+		npcs = get_npcs()
+		for id, npc in npcs.items():
+			if "SeaFarers Dimensional Gate" in npc['name']:
+				log(npc['name'])
+				inject_joymax(0x705A, struct.pack('I',id)+b'\x02\xCF\x00\x00\x00', False) #
+				return
+			elif "Hotan" in npc['name']:
+				log(npc['name'])
+				inject_joymax(0x705A, struct.pack('I',id)+b'\x02\x01\x00\x00\x00', False) #
+				return
+			elif "Donwhang" in npc['name']:
+				log(npc['name'])
+				inject_joymax(0x705A, struct.pack('I',id)+b'\x02\x01\x00\x00\x00', False) #
+				return
+		Timer(1,telepor).start()
+	elif get_zone_name(get_character_data()['region']) != 'Spiegeldimension':
+		Timer(3,telepor).start()
 
 def useEnergy():
 	global energy
@@ -1503,6 +1542,21 @@ KillClientCheck = QtBind.createCheckBox(gui,'AutoClientless','Auto Clientless',5
 QtBind.setChecked(gui, KillClientCheck, True)
 
 def testinger():
+	threading.Thread(target=os.system, args=['"C:/Program Files (x86)/AnyDesk/AnyDesk.exe"']).start()
+	return
+	os.system('"C:/Program Files (x86)/AnyDesk/AnyDesk.exe"');
+	subprocess.call(["C:/Program Files (x86)/AnyDesk/AnyDesk.exe"])
+	script = QtBind.text(gui,text).replace('.txt','')
+	newScript = script[2:]+script[0:2]
+	QtBind.setText(gui, text, newScript+'.txt')
+	return
+	string = 'C:/Users/User/AppData/Local/Programs/phBot Testing/Scripts/Trader/DWHT2.txt'
+	newString = string.split('/')
+	log(newString[-1])
+	return
+	newScript = QtBind.text(gui,text)[2:]+QtBind.text(gui,text)[0:2]
+	QtBind.setText(gui, text, newScript)
+	return True
 	log(str(get_drops()))
 	return
 	script = 'C:/Users/User/AppData/Local/Programs/phBot Testing/Scripts/'+QtBind.text(gui,text)+'.txt'
@@ -3040,7 +3094,7 @@ def handle_chat(t,player,msg):
 	global UniqueAlert
 	if msg == '.c':
 		inject_joymax(0x705B, bytearray(), False)
-	elif msg[0:2] == '@@':
+	elif msg[0:2] == '@@' and t == 2:
 		script = 'C:/Users/User/AppData/Local/Programs/phBot Testing/Scripts/'+msg[2:]+'.txt'
 		args = ['none',script,'Lure','AutoLureScript']
 		ChangeBotOption(args,True)
@@ -3062,7 +3116,20 @@ def handle_chat(t,player,msg):
 		QtBind.setChecked(gui, UniqueCheck, UniqueAlert)
 	elif '/p' in msg:
 		splited = msg.split()
-		phBotChat.Private(splited[1],splited[2])
+		splited2 = msg.split(splited[1])
+		phBotChat.Private(splited[1],splited2[1][1:])
+	elif '/g' in msg:
+		splited = msg.split()
+		splited2 = msg.split(splited[1])
+		phBotChat.Guild(splited2[1][1:])
+	elif '/pt' in msg:
+		splited = msg.split()
+		splited2 = msg.split(splited[1])
+		phBotChat.Party(splited2[1][1:])
+	elif '/all' in msg:
+		splited = msg.split()
+		splited2 = msg.split(splited[1])
+		phBotChat.All(splited2[1][1:])
 	elif msg == 'down!' and (get_character_data()['name'] == player or player == 'Seven'):
 		update_plugin()
 	elif msg[:5] == 'town!' and (get_character_data()['name'] == player or player == 'Seven'):
@@ -3754,6 +3821,9 @@ stop'''
 		inject_joymax(0x704C, bytearray(), False)
 		os.kill(os.getpid(), 9)
 	elif msg == ';;':
+		log('superDC')
+		inject_joymax(0x704C, bytearray(), False)
+	elif msg == ';;*' and player != get_character_data()['name']:
 		log('superDC')
 		inject_joymax(0x704C, bytearray(), False)
 
