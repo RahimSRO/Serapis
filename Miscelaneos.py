@@ -1314,7 +1314,7 @@ def handle_silkroad(opcode,data):
 			stop_bot()
 			stop_trace()
 			set_profile('1')
-			Timer(0.5,changeTrainingArea,['Modify']).start()
+			Timer(0.5,changeTrainingArea,['Enchantress']).start()
 			telepor()
 			if get_character_data()['name'] == 'Seven':
 				spawnPets()
@@ -3472,7 +3472,7 @@ def handle_chat(t,player,msg):
 				if x['name'] == 'Reverse Reverse Return Scroll':
 					inject_joymax(0x704C, struct.pack('b',i)+b'\xED\x19\x07\x26\x00\x00\x00', False)
 					return
-	if (t == 4 or t == 2 or t == 1) and ',' in msg and msg.replace(',','').replace('-','').isnumeric():
+	if (t == 4 or t == 2 or t == 1 or t == 5) and ',' in msg and msg.replace(',','').replace('-','').isnumeric():
 		log('aca hay comas')
 		stop_trace()
 		stop_bot()
@@ -3716,12 +3716,17 @@ stop'''
 	if TelegramBol and player not in ignore and (t == 2 or t == 9):
 		if player != char['name']:
 			threading.Thread(target=sendTelegram, args=[player + " -> " + char['name'] + ' -> ' + msg],).start()
-	if (t == 4 or t == 2) and msg.lower() == 'coo' and (char['name'] == player or char['job_name'] == player):
+	if msg.lower() == 'coo' and (char['name'] == player or char['job_name'] == player):
 		log('dijo coo en party')
 		region = str(get_position()['region'])
 		x = str(int(get_position()['x']))
 		y = str(int(get_position()['y']))
-		phBotChat.Party(region+','+x+','+y)
+		if t == 4:
+			phBotChat.Party(region+','+x+','+y)
+		elif t == 5:
+			phBotChat.Guild(region+','+x+','+y)
+		elif t == 1:
+			phBotChat.All(region+','+x+','+y)
 	elif (t == 1 or t == 2 or t == 4 or t == 5) and msg.lower() == 'stop':
 		stop_trace()
 		stop_bot()
@@ -4276,4 +4281,4 @@ def ChangeBotOption(args,reload):
 					reload_profile()
 				return 0
 
-log('[%s] Loaded v1.4' % __name__)
+log('[%s] Loaded v1.5' % __name__)
