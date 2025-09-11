@@ -1314,7 +1314,7 @@ def handle_silkroad(opcode,data):
 			stop_bot()
 			stop_trace()
 			set_profile('1')
-			Timer(0.5,changeTrainingArea,['Enchantress']).start()
+			Timer(0.5,changeTrainingArea,['Hell']).start()
 			telepor()
 			if get_character_data()['name'] == 'Seven':
 				spawnPets()
