@@ -3114,7 +3114,7 @@ def handle_chat(t,player,msg):
 	elif msg == '/z' and get_character_data()['name'] == player:
 		UniqueAlert = not UniqueAlert
 		QtBind.setChecked(gui, UniqueCheck, UniqueAlert)
-	elif '/p' in msg:
+	elif '/p' in msg[:1]:
 		splited = msg.split()
 		splited2 = msg.split(splited[1])
 		phBotChat.Private(splited[1],splited2[1][1:])
@@ -4281,4 +4281,4 @@ def ChangeBotOption(args,reload):
 					reload_profile()
 				return 0
 
-log('[%s] Loaded v1.5' % __name__)
+log('[%s] Loaded v1.6' % __name__)
