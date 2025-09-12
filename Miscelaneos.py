@@ -1314,7 +1314,7 @@ def handle_silkroad(opcode,data):
 			stop_bot()
 			stop_trace()
 			set_profile('1')
-			Timer(0.5,changeTrainingArea,['Hell']).start()
+			Timer(0.5,changeTrainingArea,['2mirror']).start()
 			telepor()
 			if get_character_data()['name'] == 'Seven':
 				spawnPets()
@@ -2795,6 +2795,7 @@ def spawnThiefPet():
 	for slot, item in enumerate(items):
 		if item:
 			if 'Goldclad Trade Horse' in item['name'] and len(get_drops()) < 10:
+				equipShield()
 				log('Summoning: '+ item['name'])
 				Packet = bytearray()
 				Packet.append(slot)
@@ -2808,6 +2809,7 @@ def spawnThiefPet():
 				inject_joymax(0x704C, Packet, True)
 				return
 			elif len(get_drops()) > 9 and (item['name'] == 'Donkey' or 'elephant' in item['name'].lower() or 'lizard' in item['name'].lower()):
+				equipShield()
 				log('Summoning: '+ item['name'])
 				Packet = bytearray()
 				Packet.append(slot)
@@ -2823,6 +2825,7 @@ def spawnThiefPet():
 	for slot, item in enumerate(items):
 		if item:
 			if 'Goldclad Trade Horse' in item['name']:
+				equipShield()
 				log('Summoning: '+ item['name'])
 				Packet = bytearray()
 				Packet.append(slot)
@@ -3094,6 +3097,8 @@ def handle_chat(t,player,msg):
 	global UniqueAlert
 	if msg == '.c':
 		inject_joymax(0x705B, bytearray(), False)
+	elif msg == '/any':
+		threading.Thread(target=os.system, args=['"C:/Program Files (x86)/AnyDesk/AnyDesk.exe"']).start()
 	elif msg[0:2] == '@@' and t == 2:
 		script = 'C:/Users/User/AppData/Local/Programs/phBot Testing/Scripts/'+msg[2:]+'.txt'
 		args = ['none',script,'Lure','AutoLureScript']
@@ -3792,7 +3797,7 @@ stop'''
 		stop_trace()
 		if t == 2 and player == 'Seven':
 			if get_inventory()['items'][8]:
-				start_trace('Rahim')
+				start_trace('Seven')
 				return
 			else:
 				start_trace(player)
@@ -4281,4 +4286,4 @@ def ChangeBotOption(args,reload):
 					reload_profile()
 				return 0
 
-log('[%s] Loaded v1.6' % __name__)
+log('[%s] Loaded v1.7' % __name__)
