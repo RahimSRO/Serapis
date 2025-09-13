@@ -186,6 +186,7 @@ def teleported():
 				notice('Pending Quest!')
 				break
 		if get_zone_name(get_character_data()['region']) == 'Diebesstadt':
+			log('disconnect()')
 			disconnect()
 		# 	Timer(2,phBotChat.Private,['Seven','Diebesstadt']).start()
 		# 	stop_bot()
@@ -2578,19 +2579,22 @@ def goMerca():
 	move_to(mercaPos[0],mercaPos[1],0)
 	return
 
+punto_v = False
+
 def puntoV():
 	log('puntoV')
 	global PICK
-	drops = get_drops()
-	if drops:
-		for dropID in drops:
-			if 'TRADE' in drops[dropID]['servername']:
-				log(drops[dropID]['servername'])
-				inject_joymax(0x705B, bytearray(), False)
-				PICK = True
-				buscarMerca()
-				return
-	Timer(1,puntoV).start()
+	if punto_v
+		drops = get_drops()
+		if drops:
+			for dropID in drops:
+				if 'TRADE' in drops[dropID]['servername']:
+					log(drops[dropID]['servername'])
+					inject_joymax(0x705B, bytearray(), False)
+					PICK = True
+					buscarMerca()
+					return
+		Timer(1,puntoV).start()
 
 def j0b():
 	# if get_zone_name(get_position()['region']) == 'Western-China-Donwhang':
@@ -3273,6 +3277,8 @@ def handle_chat(t,player,msg):
 	elif msg == 'tlp':
 		tlp()
 	elif msg == '.b':
+		global punto_v
+		punto_v = not punto_v
 		inject_joymax(0x705B, bytearray(), False)
 		stop_trace()
 		PICK = True
@@ -4287,4 +4293,4 @@ def ChangeBotOption(args,reload):
 					reload_profile()
 				return 0
 
-log('[%s] Loaded v1.8' % __name__)
+log('[%s] Loaded v1.9' % __name__)
