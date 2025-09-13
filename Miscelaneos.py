@@ -185,10 +185,6 @@ def teleported():
 			if quests[questID]['completed']:
 				notice('Pending Quest!')
 				break
-		if get_zone_name(get_character_data()['region']) == 'Diebesstadt':
-			log('disconnect()')
-			Timer(2,phBotChat.Private,['Seven','Diebesstadt']).start()
-			disconnect()
 		# 	stop_bot()
 		# 	moveToBandit()
 			# inject_joymax(0x7034, b'\x00\x6C\x6B\x01\x00',True)
@@ -197,6 +193,10 @@ def teleported():
 			# Timer(4.5,inject_joymax,[0x7045,struct.pack('I',31),True]).start()
 		Timer(5,inject_joymax,[0xA451, b'\x04', True]).start()
 		return
+	if get_zone_name(get_character_data()['region']) == 'Diebesstadt':
+		log('disconnect()')
+		Timer(2,phBotChat.Private,['Seven','Diebesstadt']).start()
+		disconnect()
 	# elif get_character_data()['name'] == 'Trump':
 	# 	if get_zone_name(get_position()['region']) == 'Tempel':
 	# 		log('Nos vemos en 2 segundos...')
@@ -1316,7 +1316,7 @@ def handle_silkroad(opcode,data):
 			stop_bot()
 			stop_trace()
 			set_profile('1')
-			Timer(0.5,changeTrainingArea,['2mirror']).start()
+			Timer(0.5,changeTrainingArea,['3mirror']).start()
 			telepor()
 			if get_character_data()['name'] == 'Seven':
 				spawnPets()
@@ -4293,4 +4293,4 @@ def ChangeBotOption(args,reload):
 					reload_profile()
 				return 0
 
-log('[%s] Loaded v2.1' % __name__)
+log('[%s] Loaded v2.2' % __name__)
