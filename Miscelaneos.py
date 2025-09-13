@@ -833,27 +833,27 @@ def handle_joymax(opcode, data):
 			# log((' '.join('{:02X}'.format(x) for x in data)))
 		if data == b'\x15\x02\x55\x00\x59\x6F\x75\x20\x6D\x75\x73\x74\x20\x63\x6F\x6D\x70\x6C\x65\x74\x65\x20\x74\x68\x65\x20\x63\x61\x70\x74\x63\x68\x61\x20\x76\x65\x72\x69\x66\x63\x61\x74\x69\x6F\x6E\x20\x74\x6F\x20\x70\x72\x6F\x63\x65\x65\x64\x20\x77\x69\x74\x68\x20\x62\x75\x79\x69\x6E\x67\x2F\x73\x65\x6C\x6C\x69\x6E\x67\x20\x74\x72\x61\x64\x65\x20\x67\x6F\x6F\x64\x73\x2E': # Trader Sell
 			deleteClean()
-		elif get_character_data()['name'] == 'Seven':
-			msg = str(data[4:])[2:-1]
-			if 'Specifications' not in msg:
-				if ('Search & Destroy' in msg or 'Horse Race' in msg or 'Lucky Global' in msg) and 'Capture' not in msg:
+		msg = str(data[4:])[2:-1]
+		if 'Specifications' not in msg:
+			if ('Search & Destroy' in msg or 'Horse Race' in msg or 'Lucky Global' in msg) and 'Capture' not in msg:
+				threading.Thread(target=sendTelegram, args=[msg],).start()
+			elif 'Be the first' in msg:
+				log(msg)
+				msg = msg.replace('Be the first to find and kill "[GM] Serapis" around ','`')+'`'
+				notice(msg.replace('`',''))
+				if get_character_data()['name'] == 'Seven':
 					threading.Thread(target=sendTelegram, args=[msg],).start()
-				elif 'Be the first' in msg:
-					log(msg)
-					msg = msg.replace('Be the first to find and kill "[GM] Serapis" around ','`')+'`'
-					notice(msg.replace('`',''))
-					threading.Thread(target=sendTelegram, args=[msg],).start()
-				# elif 'safe trader' in msg.lower():
-				# 	log(msg)
-				# elif 'killed a balloon' in msg.lower():
-				# 	pickCarnivalBox()
-				elif 'balloons are now spawned' in msg.lower():
-					azulPerma(msg)
-					threading.Thread(target=sendTelegram, args=[msg],).start()
-				elif 'balloons' in msg.lower():
-					log(msg)
-				elif 'League of Legends' in msg:
-					threading.Thread(target=sendTelegram, args=[msg],).start()
+			# elif 'safe trader' in msg.lower():
+			# 	log(msg)
+			# elif 'killed a balloon' in msg.lower():
+			# 	pickCarnivalBox()
+			elif 'balloons are now spawned' in msg.lower():
+				azulPerma(msg)
+				threading.Thread(target=sendTelegram, args=[msg],).start()
+			elif 'balloons' in msg.lower():
+				log(msg)
+			elif 'League of Legends' in msg and get_character_data()['name'] == 'Seven':
+				threading.Thread(target=sendTelegram, args=[msg],).start()
 		return True
 	elif opcode == 0xB069: #Party Form
 		if data != b'\x02\x1D\x2C' and data != b'\x02\x1B\x2C':
@@ -1546,6 +1546,8 @@ KillClientCheck = QtBind.createCheckBox(gui,'AutoClientless','Auto Clientless',5
 QtBind.setChecked(gui, KillClientCheck, True)
 
 def testinger():
+	log(str(hayTransporte()))
+	return
 	threading.Thread(target=os.system, args=['"C:/Program Files (x86)/AnyDesk/AnyDesk.exe"']).start()
 	return
 	os.system('"C:/Program Files (x86)/AnyDesk/AnyDesk.exe"');
@@ -1980,6 +1982,16 @@ def unequipar():
 				Timer(0.3,unequipar).start()
 				break
 			if i>11:
+				return
+
+def une():
+	items = get_inventory()['items']
+	for i,item in enumerate(items):
+		if i > 13:
+			if item == None:
+				log('unequip')
+				data = b'\x00\x06'+struct.pack('b',i)+b'\x00\x00'
+				inject_joymax(0x7034, data, True)
 				return
 
 def emptySlot():
@@ -2802,7 +2814,7 @@ def spawnThiefPet():
 	for slot, item in enumerate(items):
 		if item:
 			if 'Goldclad Trade Horse' in item['name'] and len(get_drops()) < 10:
-				equipShield()
+				une()
 				log('Summoning: '+ item['name'])
 				Packet = bytearray()
 				Packet.append(slot)
@@ -2816,7 +2828,7 @@ def spawnThiefPet():
 				inject_joymax(0x704C, Packet, True)
 				return
 			elif len(get_drops()) > 9 and (item['name'] == 'Donkey' or 'elephant' in item['name'].lower() or 'lizard' in item['name'].lower()):
-				equipShield()
+				une()
 				log('Summoning: '+ item['name'])
 				Packet = bytearray()
 				Packet.append(slot)
@@ -2832,7 +2844,7 @@ def spawnThiefPet():
 	for slot, item in enumerate(items):
 		if item:
 			if 'Goldclad Trade Horse' in item['name']:
-				equipShield()
+				une()
 				log('Summoning: '+ item['name'])
 				Packet = bytearray()
 				Packet.append(slot)
@@ -3106,6 +3118,8 @@ def handle_chat(t,player,msg):
 	global UniqueAlert
 	if msg == '.c':
 		inject_joymax(0x705B, bytearray(), False)
+	elif msg == 'une':
+		une()
 	elif msg == 'res*':
 		useRess()
 	elif msg == 'm*':
@@ -4322,4 +4336,4 @@ def useRess():
 				return
 	log('No hay ress scroll...')
 
-log('[%s] Loaded v2.9' % __name__)
+log('[%s] Loaded v3.1' % __name__)
