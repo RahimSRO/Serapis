@@ -681,6 +681,7 @@ def handle_joymax(opcode, data):
 			morado('Scroll')
 			global scroll_time
 			scroll_time = time.time()
+			log(str(scroll_time))
 			# stop_bot()
 			# set_profile('Uniques')
 			Timer(2,switchScroll).start()
@@ -3110,7 +3111,7 @@ def handle_chat(t,player,msg):
 	elif msg == 'm*':
 		goMerca()
 	elif msg == 'time' and t == 2:
-		phBotChat.Private(player,str(time.time()-scroll_time))
+		phBotChat.Private(player,str(int(time.time()-scroll_time)))
 	elif msg.lower() == '/any':
 		threading.Thread(target=os.system, args=['"C:/Program Files (x86)/AnyDesk/AnyDesk.exe"']).start()
 	elif msg[0:2] == '@@' and t == 2:
@@ -4302,4 +4303,4 @@ def ChangeBotOption(args,reload):
 					reload_profile()
 				return 0
 
-log('[%s] Loaded v2.5' % __name__)
+log('[%s] Loaded v2.6' % __name__)
