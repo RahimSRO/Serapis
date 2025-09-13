@@ -679,7 +679,6 @@ def handle_joymax(opcode, data):
 		if struct.unpack_from('I',data,4)[0] == 2198:#and data == b'\x57\x74\x0E\x00\x96\x08\x00\x00':
 			ScrollUsado = True
 			morado('Scroll')
-			67 05 33 04 50 08 00 00
 			Timer(2,switchScroll).start()
 		elif struct.unpack_from('I',data,4)[0] == 2128:
 			global scroll_time
