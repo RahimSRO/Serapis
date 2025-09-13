@@ -14,6 +14,7 @@ import ctypes
 import re
 import json
 import subprocess
+import time
 from phBot import *
 from threading import Timer
 from math import pi, cos, sin
@@ -678,6 +679,8 @@ def handle_joymax(opcode, data):
 		if struct.unpack_from('I',data,4)[0] == 2198:#and data == b'\x57\x74\x0E\x00\x96\x08\x00\x00':
 			ScrollUsado = True
 			morado('Scroll')
+			global scroll_time
+			scroll_time = time.time()
 			# stop_bot()
 			# set_profile('Uniques')
 			Timer(2,switchScroll).start()
@@ -3102,6 +3105,8 @@ def handle_chat(t,player,msg):
 	global UniqueAlert
 	if msg == '.c':
 		inject_joymax(0x705B, bytearray(), False)
+	elif msg == time and t == 2:
+		phBotChat.Private(player,str(time.time()-scroll_time))
 	elif msg.lower() == '/any':
 		threading.Thread(target=os.system, args=['"C:/Program Files (x86)/AnyDesk/AnyDesk.exe"']).start()
 	elif msg[0:2] == '@@' and t == 2:
@@ -3299,7 +3304,7 @@ def handle_chat(t,player,msg):
 			morado('Wolf activado')
 		else:
 			morado('Wolf desactivado')
-	if t == 2:
+	if t == 2 and len(msg)>2:
 		foo = msg.split()
 		for word in foo:
 			if word.isnumeric():
