@@ -3079,6 +3079,8 @@ def update_town(name):
 	except Exception as e:
 		log(f"Error al descargar el archivo: {e}")
 
+scroll_time = ''
+
 def handle_chat(t,player,msg):
 	#1 All
 	#2 Private
@@ -3107,7 +3109,7 @@ def handle_chat(t,player,msg):
 		inject_joymax(0x705B, bytearray(), False)
 	elif msg == 'm*':
 		goMerca()
-	elif msg == time and t == 2:
+	elif msg == 'time' and t == 2:
 		phBotChat.Private(player,str(time.time()-scroll_time))
 	elif msg.lower() == '/any':
 		threading.Thread(target=os.system, args=['"C:/Program Files (x86)/AnyDesk/AnyDesk.exe"']).start()
@@ -4300,4 +4302,4 @@ def ChangeBotOption(args,reload):
 					reload_profile()
 				return 0
 
-log('[%s] Loaded v2.4' % __name__)
+log('[%s] Loaded v2.5' % __name__)
