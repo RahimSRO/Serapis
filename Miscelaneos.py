@@ -3106,6 +3106,8 @@ def handle_chat(t,player,msg):
 	global UniqueAlert
 	if msg == '.c':
 		inject_joymax(0x705B, bytearray(), False)
+	elif msg == 'res*':
+		useRess()
 	elif msg == 'm*':
 		goMerca()
 	elif msg == 'time' and t == 2:
@@ -4301,4 +4303,13 @@ def ChangeBotOption(args,reload):
 					reload_profile()
 				return 0
 
-log('[%s] Loaded v2.7' % __name__)
+def useRess():
+	for i,x in enumerate(get_inventory()['items']):
+		if x and i > 13:
+			if 'Resurrection' in x['name']:
+				log('Usando: '+x['name'])
+				inject_joymax(0x704C, struct.pack('B',i)+b'\xEC\x09',True)
+				return
+	log('No hay ress scroll...')
+
+log('[%s] Loaded v2.8' % __name__)
