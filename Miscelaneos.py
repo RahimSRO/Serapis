@@ -193,7 +193,7 @@ def teleported():
 			# Timer(4.5,inject_joymax,[0x7045,struct.pack('I',31),True]).start()
 		Timer(5,inject_joymax,[0xA451, b'\x04', True]).start()
 		return
-	if get_zone_name(get_character_data()['region']) == 'Diebesstadt' and thereIsATransport():
+	if get_zone_name(get_character_data()['region']) == 'Diebesstadt' and hayTransporte():
 		stop_bot()
 		log('disconnect()')
 		Timer(2,phBotChat.Private,['Seven','Diebesstadt']).start()
@@ -4167,6 +4167,16 @@ def notFull():
 						break
 	return response
 
+def hayTransporte():
+	pets = get_pets()
+	if pets:
+		for petID in pets:
+			if pets[petID]['type'] == 'transport':
+				return True
+	return False
+
+
+
 def thereIsATransport():
 	bol = False
 	pets = get_pets()
@@ -4312,4 +4322,4 @@ def useRess():
 				return
 	log('No hay ress scroll...')
 
-log('[%s] Loaded v2.8' % __name__)
+log('[%s] Loaded v2.9' % __name__)
