@@ -185,7 +185,8 @@ def teleported():
 			if quests[questID]['completed']:
 				notice('Pending Quest!')
 				break
-		# if get_zone_name(get_character_data()['region']) == 'Diebesstadt':
+		if get_zone_name(get_character_data()['region']) == 'Diebesstadt':
+			disconnect()
 		# 	Timer(2,phBotChat.Private,['Seven','Diebesstadt']).start()
 		# 	stop_bot()
 		# 	moveToBandit()
@@ -3097,7 +3098,7 @@ def handle_chat(t,player,msg):
 	global UniqueAlert
 	if msg == '.c':
 		inject_joymax(0x705B, bytearray(), False)
-	elif msg == '/any':
+	elif msg.lower() == '/any':
 		threading.Thread(target=os.system, args=['"C:/Program Files (x86)/AnyDesk/AnyDesk.exe"']).start()
 	elif msg[0:2] == '@@' and t == 2:
 		script = 'C:/Users/User/AppData/Local/Programs/phBot Testing/Scripts/'+msg[2:]+'.txt'
@@ -4286,4 +4287,4 @@ def ChangeBotOption(args,reload):
 					reload_profile()
 				return 0
 
-log('[%s] Loaded v1.7' % __name__)
+log('[%s] Loaded v1.8' % __name__)
