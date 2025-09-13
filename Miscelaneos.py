@@ -2584,7 +2584,7 @@ punto_v = False
 def puntoV():
 	log('puntoV')
 	global PICK
-	if punto_v
+	if punto_v:
 		drops = get_drops()
 		if drops:
 			for dropID in drops:
