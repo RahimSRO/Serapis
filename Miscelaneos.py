@@ -3277,13 +3277,13 @@ def handle_chat(t,player,msg):
 	elif msg == 'tlp':
 		tlp()
 	elif msg == '.b':
-		global punto_v
-		punto_v = not punto_v
 		inject_joymax(0x705B, bytearray(), False)
 		stop_trace()
 		PICK = True
 		buscarMerca()
 	elif msg == '.v':
+		global punto_v
+		punto_v = not punto_v
 		puntoV()
 	elif msg == 'exit':
 		exit()
@@ -4293,4 +4293,4 @@ def ChangeBotOption(args,reload):
 					reload_profile()
 				return 0
 
-log('[%s] Loaded v1.9' % __name__)
+log('[%s] Loaded v2.0' % __name__)
