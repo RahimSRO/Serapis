@@ -679,13 +679,12 @@ def handle_joymax(opcode, data):
 		if struct.unpack_from('I',data,4)[0] == 2198:#and data == b'\x57\x74\x0E\x00\x96\x08\x00\x00':
 			ScrollUsado = True
 			morado('Scroll')
+			67 05 33 04 50 08 00 00
+			Timer(2,switchScroll).start()
+		elif struct.unpack_from('I',data,4)[0] == 2128:
 			global scroll_time
 			scroll_time = time.time()
 			log(str(scroll_time))
-			# stop_bot()
-			# set_profile('Uniques')
-			Timer(2,switchScroll).start()
-		elif struct.unpack_from('I',data,4)[0] == 2128:
 			morado('Bandit Scroll')
 	# if opcode == 0x706D: #party member joined
 	# 	name = struct.unpack_from('<' + str(data[6]) + 's',data,8)[0].decode('cp1252')
@@ -4303,4 +4302,4 @@ def ChangeBotOption(args,reload):
 					reload_profile()
 				return 0
 
-log('[%s] Loaded v2.6' % __name__)
+log('[%s] Loaded v2.7' % __name__)
