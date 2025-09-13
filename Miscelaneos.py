@@ -187,8 +187,8 @@ def teleported():
 				break
 		if get_zone_name(get_character_data()['region']) == 'Diebesstadt':
 			log('disconnect()')
+			Timer(2,phBotChat.Private,['Seven','Diebesstadt']).start()
 			disconnect()
-		# 	Timer(2,phBotChat.Private,['Seven','Diebesstadt']).start()
 		# 	stop_bot()
 		# 	moveToBandit()
 			# inject_joymax(0x7034, b'\x00\x6C\x6B\x01\x00',True)
@@ -4293,4 +4293,4 @@ def ChangeBotOption(args,reload):
 					reload_profile()
 				return 0
 
-log('[%s] Loaded v2.0' % __name__)
+log('[%s] Loaded v2.1' % __name__)
