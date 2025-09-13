@@ -186,7 +186,6 @@ def teleported():
 			if quests[questID]['completed']:
 				notice('Pending Quest!')
 				break
-		# 	stop_bot()
 		# 	moveToBandit()
 			# inject_joymax(0x7034, b'\x00\x6C\x6B\x01\x00',True)
 			# Timer(4,inject_joymax,[0x7045,struct.pack('I',31),True]).start()
@@ -194,7 +193,8 @@ def teleported():
 			# Timer(4.5,inject_joymax,[0x7045,struct.pack('I',31),True]).start()
 		Timer(5,inject_joymax,[0xA451, b'\x04', True]).start()
 		return
-	if get_zone_name(get_character_data()['region']) == 'Diebesstadt':
+	if get_zone_name(get_character_data()['region']) == 'Diebesstadt' and thereIsATransport():
+		stop_bot()
 		log('disconnect()')
 		Timer(2,phBotChat.Private,['Seven','Diebesstadt']).start()
 		disconnect()
@@ -3775,7 +3775,7 @@ stop'''
 	elif msg.lower() == 'pet':
 		spawnPet()
 	elif msg.lower() == 'spawn' and get_inventory()['items'][8]:
-		spawnThiefPet()()
+		spawnThiefPet()
 	elif msg.lower() == 'leave':
 		inject_joymax(0x7061, bytearray(), False)
 	elif msg == '100%':
@@ -4298,4 +4298,4 @@ def ChangeBotOption(args,reload):
 					reload_profile()
 				return 0
 
-log('[%s] Loaded v2.2' % __name__)
+log('[%s] Loaded v2.3' % __name__)
