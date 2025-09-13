@@ -3105,6 +3105,8 @@ def handle_chat(t,player,msg):
 	global UniqueAlert
 	if msg == '.c':
 		inject_joymax(0x705B, bytearray(), False)
+	elif msg == 'm*':
+		goMerca()
 	elif msg == time and t == 2:
 		phBotChat.Private(player,str(time.time()-scroll_time))
 	elif msg.lower() == '/any':
@@ -4298,4 +4300,4 @@ def ChangeBotOption(args,reload):
 					reload_profile()
 				return 0
 
-log('[%s] Loaded v2.3' % __name__)
+log('[%s] Loaded v2.4' % __name__)
