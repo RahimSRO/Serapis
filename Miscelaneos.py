@@ -161,16 +161,22 @@ def teleported():
 	global mercaPos
 	global PICK
 	global UINT
+	if get_zone_name(get_character_data()['region']) == 'Diebesstadt':
+		log('hayTransporte')
+		stop_bot()
+		disconnect()
+		log('disconnect()')
+		Timer(1,phBotChat.Private,['Seven','Diebesstadt']).start()
 	if get_character_data()['name'] == 'Seven':
-		if get_character_data()['region'] == 23603 and get_inventory()['items'][8]: #alex north
-			TownSpawn()
-			stop_bot()
-			Timer(1,inject_joymax,[0x705A,bytes.fromhex('04 00 00 00 02 AE 00 00 00'),False]).start()
+		# if get_character_data()['region'] == 23603 and get_inventory()['items'][8]: #alex north
+		# 	TownSpawn()
+		# 	stop_bot()
+		# 	Timer(1,inject_joymax,[0x705A,bytes.fromhex('04 00 00 00 02 AE 00 00 00'),False]).start()
 			# start_bot()
-		elif get_position()['region'] == -32752: #Tempel
-			log('Nos vemos en 2 segundos...')
-			Timer(5,start_bot).start()
-		elif get_position()['region'] == 25000: #Jangan
+		# elif get_position()['region'] == -32752: #Tempel
+		# 	log('Nos vemos en 2 segundos...')
+		# 	Timer(5,start_bot).start()
+		if get_position()['region'] == 25000: #Jangan
 			move_jangan()
 		LastUniqueInRange = False
 		UINT = False
@@ -193,11 +199,14 @@ def teleported():
 			# Timer(4.5,inject_joymax,[0x7045,struct.pack('I',31),True]).start()
 		Timer(5,inject_joymax,[0xA451, b'\x04', True]).start()
 		return
-	if get_zone_name(get_character_data()['region']) == 'Diebesstadt' and hayTransporte():
+
+def Diebesstadt():
+	if hayTransporte():
+		log('hayTransporte')
 		stop_bot()
 		log('disconnect()')
-		Timer(2,phBotChat.Private,['Seven','Diebesstadt']).start()
 		disconnect()
+		Timer(1,phBotChat.Private,['Seven','Diebesstadt']).start()
 	# elif get_character_data()['name'] == 'Trump':
 	# 	if get_zone_name(get_position()['region']) == 'Tempel':
 	# 		log('Nos vemos en 2 segundos...')
@@ -834,9 +843,11 @@ def handle_joymax(opcode, data):
 		if data == b'\x15\x02\x55\x00\x59\x6F\x75\x20\x6D\x75\x73\x74\x20\x63\x6F\x6D\x70\x6C\x65\x74\x65\x20\x74\x68\x65\x20\x63\x61\x70\x74\x63\x68\x61\x20\x76\x65\x72\x69\x66\x63\x61\x74\x69\x6F\x6E\x20\x74\x6F\x20\x70\x72\x6F\x63\x65\x65\x64\x20\x77\x69\x74\x68\x20\x62\x75\x79\x69\x6E\x67\x2F\x73\x65\x6C\x6C\x69\x6E\x67\x20\x74\x72\x61\x64\x65\x20\x67\x6F\x6F\x64\x73\x2E': # Trader Sell
 			deleteClean()
 		msg = str(data[4:])[2:-1]
-		if 'Specifications' not in msg:
+		if 'Scenario' not in msg:
+		# if 'Specifications' not in msg:
 			if ('Search & Destroy' in msg or 'Horse Race' in msg or 'Lucky Global' in msg) and 'Capture' not in msg:
-				threading.Thread(target=sendTelegram, args=[msg],).start()
+				if get_character_data()['name'] == 'Seven':
+					threading.Thread(target=sendTelegram, args=[msg],).start()
 			elif 'Be the first' in msg:
 				log(msg)
 				msg = msg.replace('Be the first to find and kill "[GM] Serapis" around ','`')+'`'
@@ -1546,6 +1557,17 @@ KillClientCheck = QtBind.createCheckBox(gui,'AutoClientless','Auto Clientless',5
 QtBind.setChecked(gui, KillClientCheck, True)
 
 def testinger():
+	Guild = get_guild()
+	if Guild:
+		for memberID in Guild:
+			if Guild[memberID]['online']:
+				if Guild[memberID]['name'] == get_character_data()['name']:
+					log('Yes')
+					return
+				else:
+					log('No')
+					return
+	return
 	log(str(hayTransporte()))
 	return
 	threading.Thread(target=os.system, args=['"C:/Program Files (x86)/AnyDesk/AnyDesk.exe"']).start()
@@ -4336,4 +4358,4 @@ def useRess():
 				return
 	log('No hay ress scroll...')
 
-log('[%s] Loaded v3.1' % __name__)
+log('[%s] Loaded v3.2' % __name__)
