@@ -845,17 +845,15 @@ def handle_joymax(opcode, data):
 		msg = str(data[4:])[2:-1]
 		if 'Scenario' not in msg:
 		# if 'Specifications' not in msg:
-			if ('Search & Destroy' in msg or 'Horse Race' in msg or 'Lucky Global' in msg) and 'Capture' not in msg:
-				if get_character_data()['name'] == 'Seven':
+			if ('Search & Destroy' in msg or 'Horse Race' in msg or '"Lucky Global" event will start in 1 minutes.' in msg) and 'Capture' not in msg:
+				if topGuild():
 					threading.Thread(target=sendTelegram, args=[msg],).start()
 			elif 'Be the first' in msg:
 				log(msg)
 				msg = msg.replace('Be the first to find and kill "[GM] Serapis" around ','`')+'`'
 				notice(msg.replace('`',''))
-				if get_character_data()['name'] == 'Seven':
+				if topGuild():
 					threading.Thread(target=sendTelegram, args=[msg],).start()
-			# elif 'safe trader' in msg.lower():
-			# 	log(msg)
 			# elif 'killed a balloon' in msg.lower():
 			# 	pickCarnivalBox()
 			elif 'balloons are now spawned' in msg.lower():
@@ -863,7 +861,7 @@ def handle_joymax(opcode, data):
 				threading.Thread(target=sendTelegram, args=[msg],).start()
 			elif 'balloons' in msg.lower():
 				log(msg)
-			elif 'League of Legends' in msg and get_character_data()['name'] == 'Seven':
+			elif 'League of Legends' in msg and topGuild():
 				threading.Thread(target=sendTelegram, args=[msg],).start()
 		return True
 	elif opcode == 0xB069: #Party Form
@@ -1093,7 +1091,7 @@ def spawnPets():
 		return
 	items = get_inventory()['items']
 	for slot, item in enumerate(items):
-		if item and ('Red Dragon' in item['name'] or 'Griffin' in item['name'] or 'Dino' in item['name'] or 'Silverback' in item['name']) and not dragon:
+		if item and ('Red Dragon' in item['name'] or 'Griffin' in item['name'] or 'Dino' in item['name'] or 'Silverback' in item['name'] or 'Roar' in item['name']) and not dragon:
 			log('Summoning: '+ item['name'])
 			inject_joymax(0x704C, struct.pack('b',slot)+b'\xCD\x08', True)
 			Timer(0.5,spawnPets).start()
@@ -1325,11 +1323,11 @@ def handle_silkroad(opcode,data):
 			return False
 			# trigerESSENCE2()
 		elif data ==  b'\x01':
-			morado('Mirror')
+			morado('Cutter')
 			stop_bot()
 			stop_trace()
 			set_profile('1')
-			Timer(0.5,changeTrainingArea,['3mirror']).start()
+			Timer(0.5,changeTrainingArea,['Cutter']).start()
 			telepor()
 			if get_character_data()['name'] == 'Seven':
 				spawnPets()
@@ -1560,6 +1558,7 @@ def testinger():
 	Guild = get_guild()
 	if Guild:
 		for memberID in Guild:
+			log(Guild[memberID]['name'])
 			if Guild[memberID]['online']:
 				if Guild[memberID]['name'] == get_character_data()['name']:
 					log('Yes')
@@ -1658,6 +1657,17 @@ def PathMaker():
 	file.close()
 	log('Listo el script')
 
+def topGuild():
+	Guild = get_guild()
+	if Guild:
+		for memberID in Guild:
+			log(Guild[memberID]['name'])
+			if Guild[memberID]['online']:
+				if Guild[memberID]['name'] == get_character_data()['name']:
+					return True
+				else:
+					return False
+	return False
 
 def alejare():
 	stop_bot()
@@ -3155,7 +3165,9 @@ def handle_chat(t,player,msg):
 		args = ['none',script,'Lure','AutoLureScript']
 		ChangeBotOption(args,True)
 		args = ['none',True,'Lure','UseLureScript']
-		Timer(2,ChangeBotOption,[args,True]).start()
+		Timer(3,ChangeBotOption,[args,True]).start()
+		args = ['none',False,'Lure','LureWalk']
+		Timer(6,ChangeBotOption,[args,True]).start()
 	elif 'walk' in msg:
 		log('walk,'+str(round(get_position()['x']))+','+str(round(get_position()['y']))+','+str(round(get_position()['z'])))
 	elif msg == '.q':
@@ -4358,4 +4370,4 @@ def useRess():
 				return
 	log('No hay ress scroll...')
 
-log('[%s] Loaded v3.2' % __name__)
+log('[%s] Loaded v3.3' % __name__)
