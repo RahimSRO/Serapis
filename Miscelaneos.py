@@ -1323,11 +1323,11 @@ def handle_silkroad(opcode,data):
 			return False
 			# trigerESSENCE2()
 		elif data ==  b'\x01':
-			morado('Cutter')
+			morado('Mirror')
 			stop_bot()
 			stop_trace()
 			set_profile('1')
-			Timer(0.5,changeTrainingArea,['Cutter']).start()
+			Timer(0.5,changeTrainingArea,['Temple Warrior']).start()
 			telepor()
 			if get_character_data()['name'] == 'Seven':
 				spawnPets()
@@ -1370,7 +1370,7 @@ def handle_silkroad(opcode,data):
 
 def telepor():
 	log('telepor')
-	ciudades = [25000,26265,23687]
+	ciudades = [25000,26959,26265,23687]
 	if get_position()['region'] in ciudades:
 		npcs = get_npcs()
 		for id, npc in npcs.items():
@@ -1383,6 +1383,10 @@ def telepor():
 				inject_joymax(0x705A, struct.pack('I',id)+b'\x02\x01\x00\x00\x00', False) #
 				return
 			elif "Donwhang" in npc['name']:
+				log(npc['name'])
+				inject_joymax(0x705A, struct.pack('I',id)+b'\x02\x01\x00\x00\x00', False) #
+				return
+			elif "Constantinople" in npc['name']:
 				log(npc['name'])
 				inject_joymax(0x705A, struct.pack('I',id)+b'\x02\x01\x00\x00\x00', False) #
 				return
@@ -1555,6 +1559,8 @@ KillClientCheck = QtBind.createCheckBox(gui,'AutoClientless','Auto Clientless',5
 QtBind.setChecked(gui, KillClientCheck, True)
 
 def testinger():
+	telepor()
+	return
 	Guild = get_guild()
 	if Guild:
 		for memberID in Guild:
@@ -3006,12 +3012,6 @@ def resurection(n):
 	Packet.append(0x00)
 	inject_joymax(0x7059, Packet, False)
 
-def help():
-	global jelp
-	if jelp:
-		phBotChat.All('PARTY @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@')
-		Timer(10,help).start()
-
 def joinParty():
 	global partyNumber
 	if not get_party() and partyNumber != 0:
@@ -3168,6 +3168,8 @@ def handle_chat(t,player,msg):
 		Timer(3,ChangeBotOption,[args,True]).start()
 		args = ['none',False,'Lure','LureWalk']
 		Timer(6,ChangeBotOption,[args,True]).start()
+		args = ['none',False,'Lure','CastSkill']
+		Timer(9,ChangeBotOption,[args,True]).start()
 	elif 'walk' in msg:
 		log('walk,'+str(round(get_position()['x']))+','+str(round(get_position()['y']))+','+str(round(get_position()['z'])))
 	elif msg == '.q':
@@ -4370,4 +4372,4 @@ def useRess():
 				return
 	log('No hay ress scroll...')
 
-log('[%s] Loaded v3.3' % __name__)
+log('[%s] Loaded v3.4' % __name__)
