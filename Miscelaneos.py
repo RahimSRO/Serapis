@@ -3203,6 +3203,7 @@ def handle_chat(t,player,msg):
 		phBotChat.All(splited2[1][1:])
 	elif msg == 'down!' and (get_character_data()['name'] == player or player == 'Seven'):
 		update_plugin()
+		phBotChat.Private(player,'Successfully!')
 	elif msg[:5] == 'town!' and (get_character_data()['name'] == player or player == 'Seven'):
 		log(f'updating {msg[5:]}')
 		update_town(msg[5:])
@@ -4373,4 +4374,4 @@ def useRess():
 				return
 	log('No hay ress scroll...')
 
-log('[%s] Loaded v3.5' % __name__)
+log('[%s] Loaded v3.6' % __name__)
