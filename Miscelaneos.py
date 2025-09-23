@@ -1327,7 +1327,7 @@ def handle_silkroad(opcode,data):
 			stop_bot()
 			stop_trace()
 			set_profile('1')
-			Timer(0.5,changeTrainingArea,['Temple Warrior']).start()
+			Timer(0.5,changeTrainingArea,['mirror2']).start()
 			telepor()
 			if get_character_data()['name'] == 'Seven':
 				spawnPets()
@@ -1664,7 +1664,7 @@ def PathMaker():
 	log('Listo el script')
 
 def topGuild():
-	if get_character_data()['guild'] == 'Thiefs'
+	if get_character_data()['guild'] == 'Thiefs':
 		Guild = get_guild()
 		if Guild:
 			for memberID in Guild:
