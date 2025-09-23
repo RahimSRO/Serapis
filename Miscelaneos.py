@@ -1664,15 +1664,16 @@ def PathMaker():
 	log('Listo el script')
 
 def topGuild():
-	Guild = get_guild()
-	if Guild:
-		for memberID in Guild:
-			log(Guild[memberID]['name'])
-			if Guild[memberID]['online']:
-				if Guild[memberID]['name'] == get_character_data()['name']:
-					return True
-				else:
-					return False
+	if get_character_data()['guild'] == 'Thiefs'
+		Guild = get_guild()
+		if Guild:
+			for memberID in Guild:
+				log(Guild[memberID]['name'])
+				if Guild[memberID]['online']:
+					if Guild[memberID]['name'] == get_character_data()['name']:
+						return True
+					else:
+						return False
 	return False
 
 def alejare():
@@ -4372,4 +4373,4 @@ def useRess():
 				return
 	log('No hay ress scroll...')
 
-log('[%s] Loaded v3.4' % __name__)
+log('[%s] Loaded v3.5' % __name__)
