@@ -867,6 +867,11 @@ def handle_joymax(opcode, data):
 				log(msg)
 			elif 'League of Legends' in msg and topGuild():
 				threading.Thread(target=sendTelegram, args=[msg],).start()
+			elif 'Christmas Uniques:' in msg:
+				azulPerma(msg)
+				if topGuild():
+					threading.Thread(target=sendTelegram, args=[msg],).start()
+
 		return True
 	elif opcode == 0xB069: #Party Form
 		if data != b'\x02\x1D\x2C' and data != b'\x02\x1B\x2C':
@@ -1572,8 +1577,9 @@ KillClientCheck = QtBind.createCheckBox(gui,'AutoClientless','Auto Clientless',5
 QtBind.setChecked(gui, KillClientCheck, True)
 
 def testinger():
-	NotEasyPick()
+	log(str(get_avatar()))
 	return
+	NotEasyPick()
 	telepor()
 	return
 	Guild = get_guild()
@@ -4394,4 +4400,4 @@ def useRess():
 				return
 	log('No hay ress scroll...')
 
-log('[%s] Loaded v3.6' % __name__)
+log('[%s] Loaded v3.8' % __name__)
