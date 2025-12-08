@@ -143,8 +143,10 @@ def talkToBandit():
 
 def move_jangan():
 	if get_position()['region'] == 25000:
-		x1 = 6424
-		y1 = 1095
+		# x1 = 6424
+		# y1 = 1095
+		x1 = 6421
+		y1 = 1093
 		move_to(x1,y1,-32)
 		x2 = get_position()['x']
 		y2 = get_position()['y']
@@ -489,7 +491,7 @@ def easyPick(k=0):
 				return
 				return
 
-def NotEasyPick():
+def NotEasyPick(): #pick with hand
 	global verde_log
 	drops = get_drops()
 	if drops:
@@ -649,6 +651,8 @@ def handle_joymax(opcode, data):
 	global dcName
 	if opcode == 0x3040 and len(data) == 23:
 		verdemini(get_item(struct.unpack_from('i', data, 7)[0])['name'])
+	elif opcode == 0xA101 and not get_client()['running']:
+		os.kill(os.getpid(), 9)
 	elif opcode == 0x3041 and get_character_data()['player_id'] == struct.unpack_from('I',data,0)[0]:
 		if get_inventory()['items'][8]:
 			return
@@ -657,9 +661,9 @@ def handle_joymax(opcode, data):
 	elif opcode == 0xB007: #capa no capa
 		log('CAPA NO CAPA: '+str(struct.unpack_from('<I', data, 83)[0]))
 		name = struct.unpack_from('<' + str(data[7]) + 's',data,9)[0].decode('cp1252')
-		if name != 'Seven' and CLIENTLESS_BOL:
-			killClient()
-			return
+		# if name != 'Seven' and CLIENTLESS_BOL:
+		# 	killClient()
+		# 	return
 		if struct.unpack_from('<I', data, 83)[0] == 10722309 and name == 'Trump':
 			QtBind.setText(gui, text, struct.unpack_from('<' + str(data[7]) + 's',data,9)[0].decode('cp1252'))
 			killClient()
@@ -843,7 +847,7 @@ def handle_joymax(opcode, data):
 		if data == b'\x15\x02\x55\x00\x59\x6F\x75\x20\x6D\x75\x73\x74\x20\x63\x6F\x6D\x70\x6C\x65\x74\x65\x20\x74\x68\x65\x20\x63\x61\x70\x74\x63\x68\x61\x20\x76\x65\x72\x69\x66\x63\x61\x74\x69\x6F\x6E\x20\x74\x6F\x20\x70\x72\x6F\x63\x65\x65\x64\x20\x77\x69\x74\x68\x20\x62\x75\x79\x69\x6E\x67\x2F\x73\x65\x6C\x6C\x69\x6E\x67\x20\x74\x72\x61\x64\x65\x20\x67\x6F\x6F\x64\x73\x2E': # Trader Sell
 			deleteClean()
 		msg = str(data[4:])[2:-1]
-		if 'Scenario' not in msg:
+		if 'Capture The Flag' not in msg and 'Destroy enemy Towers' not in msg:
 		# if 'Specifications' not in msg:
 			if ('Search & Destroy' in msg or 'Horse Race' in msg or '"Lucky Global" event will start in 1 minutes.' in msg) and 'Capture' not in msg:
 				if topGuild():
@@ -898,6 +902,7 @@ def handle_joymax(opcode, data):
 		elif data[0] == 6:
 			if get_character_data()['region'] != 25037 and get_position()['region'] != -32752 and get_position()['region'] != 24268:
 				if get_zone_name(get_character_data()['region']) != 'Spiegeldimension':
+					log('Deberia agarrar a mano')
 					easyPick()
 					NotEasyPick()
 			name = str(data[8:])[2:-1]
@@ -951,6 +956,10 @@ def handle_joymax(opcode, data):
 
 def afterUnique():
 	useSpecialReturnScroll()
+	if QtBind.text(gui,configName) == '.':
+		QtBind.setText(gui, uniqueSTRname, '')
+		mirroring()
+		return
 	set_profile(QtBind.text(gui,configName))
 	if QtBind.text(gui,configName) == 'Templo':
 		j0b()
@@ -1140,6 +1149,16 @@ def mirror(f=0):
 			return
 	return
 
+
+def mirroring():
+	stop_bot()
+	stop_trace()
+	set_profile('1')
+	Timer(0.5,changeTrainingArea,['mirror2']).start()
+	telepor()
+	if get_character_data()['name'] == 'Seven':
+		spawnPets()
+
 def handle_silkroad(opcode,data):
 	global PICK
 	global partyNumber
@@ -1294,9 +1313,9 @@ def handle_silkroad(opcode,data):
 	elif opcode == 0x3091: #esencia1
 		if data ==  b'\x00':
 			#cambia a perfil grinding y se iba a scout a grindear
-			morado('Grinding')
-			set_profile('Grinding')
-			Timer(0.5,changeTrainingArea,['Scout']).start()
+			morado('STR')
+			set_profile('STR')
+			# Timer(0.5,changeTrainingArea,['Scout']).start()
 			spawnPickPet()
 			return False
 			# trigerESSENCE()
@@ -1324,13 +1343,7 @@ def handle_silkroad(opcode,data):
 			# trigerESSENCE2()
 		elif data ==  b'\x01':
 			morado('Mirror')
-			stop_bot()
-			stop_trace()
-			set_profile('1')
-			Timer(0.5,changeTrainingArea,['mirror2']).start()
-			telepor()
-			if get_character_data()['name'] == 'Seven':
-				spawnPets()
+			mirroring()
 			return False
 			#Pick trade goods
 			set_training_position(0,0,0,0)
@@ -1559,6 +1572,8 @@ KillClientCheck = QtBind.createCheckBox(gui,'AutoClientless','Auto Clientless',5
 QtBind.setChecked(gui, KillClientCheck, True)
 
 def testinger():
+	NotEasyPick()
+	return
 	telepor()
 	return
 	Guild = get_guild()
@@ -2300,6 +2315,7 @@ def picky():
 	drops = get_drops()
 	if drops:
 		for dropID in drops:
+			log(drops[dropID]['name'])
 			x1 = get_position()['x']
 			y1 = get_position()['y']
 			max_distance = 0
@@ -3185,7 +3201,7 @@ def handle_chat(t,player,msg):
 	elif msg == '/z' and get_character_data()['name'] == player:
 		UniqueAlert = not UniqueAlert
 		QtBind.setChecked(gui, UniqueCheck, UniqueAlert)
-	elif '/p' in msg[:1]:
+	elif '/p' in msg[:2]:
 		splited = msg.split()
 		splited2 = msg.split(splited[1])
 		phBotChat.Private(splited[1],splited2[1][1:])
@@ -3457,6 +3473,7 @@ def handle_chat(t,player,msg):
 		set_profile('Uniques')
 		reverse_return(3, "Fruchtbarkeitstempel")
 	elif ((t == 2 and player == 'Seven') or player == get_character_data()['name']) and msg.lower() == 'tpisy1':
+		inject_joymax(0x715F, bytes.fromhex('EF 8A 00 00 D3 0E 00 00 07 14 00 00 00'), False)
 		stop_trace()
 		set_profile('Uniques')
 		stop_bot()
@@ -3467,6 +3484,7 @@ def handle_chat(t,player,msg):
 					inject_joymax(0x704C, struct.pack('b',i)+b'\xEC\x19\x07\x14\x00\x00\x00', False)
 					return
 	elif ((t == 2 and player == 'Seven') or player == get_character_data()['name']) and msg.lower() == 'tpisy2':
+		inject_joymax(0x715F, bytes.fromhex('EF 8A 00 00 D3 0E 00 00 07 15 00 00 00'), False)
 		stop_trace()
 		stop_bot()
 		set_profile('Uniques')
@@ -3477,6 +3495,7 @@ def handle_chat(t,player,msg):
 					inject_joymax(0x704C, struct.pack('b',i)+b'\xEC\x19\x07\x15\x00\x00\x00', False)
 					return
 	elif ((t == 2 and player == 'Seven') or player == get_character_data()['name']) and msg.lower() == 'tpisy3':
+		inject_joymax(0x715F, bytes.fromhex('EF 8A 00 00 D3 0E 00 00 07 15 00 00 00'), False)
 		stop_trace()
 		set_profile('Uniques')
 		stop_bot()
@@ -3497,11 +3516,13 @@ def handle_chat(t,player,msg):
 		set_profile('Uniques')
 		reverse_return(3, "Windstadt") #Wind Town
 	elif ((t == 2 and player == 'Seven') or player == get_character_data()['name']) and msg.lower() == 'tpivy':
+		inject_joymax(0x715F, bytes.fromhex('EF 8A 00 00 D3 0E 00 00 07 05 00 00 00'), False)
 		stop_trace()
 		set_profile('Uniques')
 		stop_bot()
 		reverse_return(3, "Cleopatra-Tor") #Wind Town
 	elif ((t == 2 and player == 'Seven') or player == get_character_data()['name']) and msg.lower() == 'tpivy2':
+		inject_joymax(0x715F, bytes.fromhex('8A 00 00 D3 0E 00 00 07 04 00 00 00'), False)
 		stop_trace()
 		set_profile('Uniques')
 		stop_bot()
