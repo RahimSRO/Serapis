@@ -4394,4 +4394,4 @@ def useRess():
 				return
 	log('No hay ress scroll...')
 
-log('[%s] Loaded v3.5' % __name__)
+log('[%s] Loaded v3.6' % __name__)
