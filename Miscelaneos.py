@@ -868,8 +868,9 @@ def handle_joymax(opcode, data):
 			elif 'League of Legends' in msg and topGuild():
 				threading.Thread(target=sendTelegram, args=[msg],).start()
 			elif 'Christmas Uniques:' in msg:
+				log(msg)
 				azulPerma(msg)
-				if topGuild():
+				if get_character_data()['name'] == 'Wan':
 					threading.Thread(target=sendTelegram, args=[msg],).start()
 
 		return True
@@ -911,7 +912,10 @@ def handle_joymax(opcode, data):
 					easyPick()
 					NotEasyPick()
 			name = str(data[8:])[2:-1]
-			log(name + ' Killed  -> '+ get_monster(struct.unpack_from('<I', data, 2)[0])['name'])
+			uniqueNeim = get_monster(struct.unpack_from('<I', data, 2)[0])['name']
+			log(name + ' Killed  -> '+ uniqueNeim)
+			if ('Drager' in uniqueNeim or 'White Knight' in uniqueNeim) and get_character_data()['name'] == 'Wan':
+				sendTelegram2(name + ' Killed  -> '+ uniqueNeim)
 			if QtBind.text(gui,uniqueSTRname) != '' and QtBind.text(gui,uniqueSTRname).lower() in get_monster(struct.unpack_from('<I', data, 2)[0])['name'].lower():
 				log('EJECUTANDO SCRIPT DE CAMBIO')
 				Timer(10,afterUnique).start()
@@ -4104,7 +4108,7 @@ GetPosition = QtBind.createButton(gui,'GetPos',"GetPos",510,220)
 GetPosition = QtBind.createButton(gui,'GetPosition',"GetPosition",510,240)
 
 uniqueSTRname = QtBind.createLineEdit(gui,"",325,276,80,20)
-configName = QtBind.createLineEdit(gui,"Akeru",420,276,80,20)
+configName = QtBind.createLineEdit(gui,".",420,276,80,20)
 
 def GetPos():
 	QtBind.setText(gui, XY, str(int(get_position()['x']))+','+str(int(get_position()['y'])))
@@ -4400,4 +4404,4 @@ def useRess():
 				return
 	log('No hay ress scroll...')
 
-log('[%s] Loaded v3.8' % __name__)
+log('[%s] Loaded v3.9' % __name__)
