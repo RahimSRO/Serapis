@@ -26,6 +26,8 @@ ScrollUsado = False
 CLIENTLESS_BOL = True
 startAfterPick = ''
 berserker = False
+afterUniqueName = 'Tralalero'
+superBoleano = True
 
 def zerk():
 	global berserker
@@ -89,7 +91,7 @@ UINT = False
 dropg = False
 gui = QtBind.init(__name__,'Miscelaneos')
 ignore = ['[BOT]System','[BOT]Evento','[BOT]Evento1','[BOT]Evento2','Seven','Zoser']
-uniques = ["Tiger Girl","Cerberus","Captain Ivy","Uruchi","Isyutaru","Lord Yarkan","Demon Shaitan","White Knight","Homocidal Santa","[GM] Serapis"]
+uniques = ["Tiger Girl","Cerberus","Captain Ivy","Uruchi","Isyutaru","Lord Yarkan","Demon Shaitan","White Knights","Homocidal Santa","[GM] Serapis"]
 NotificarCheck = QtBind.createCheckBox(gui,'Notificar','Notificar Chat',70,10)
 partyAlertCheck = QtBind.createCheckBox(gui,'partyAlertChecker','Party Alert',90,40)
 QtBind.setChecked(gui, NotificarCheck, True)
@@ -492,7 +494,9 @@ def easyPick(k=0):
 				return
 
 def NotEasyPick(): #pick with hand
+	log('NotEasyPick')
 	global verde_log
+	global afterUniqueName
 	drops = get_drops()
 	if drops:
 		for dropID in drops:
@@ -540,8 +544,28 @@ def NotEasyPick(): #pick with hand
 					log(drops[dropID]['name'])
 				Timer(0.3,NotEasyPick).start()
 				return
+		for dropID in drops:
+			if 'special return' in drops[dropID]['name'].lower() and drops[dropID]['can_pick']:
+				aquamini('No hay mas drops')
+				uniqueMatch = QtBind.text(gui,uniqueSTRname).lower()
+				log(f'afterUniqueName: {afterUniqueName}')
+				log(f'uniqueMatch: {uniqueMatch}')
+				if QtBind.text(gui,configName) == '.' and uniqueMatch and uniqueMatch in afterUniqueName:
+					afterUniqueName = ''
+					useSpecialReturnScroll()
+					QtBind.setText(gui, uniqueSTRname, '')
+					mirroring()
+				return
 	else:
 		aquamini('No hay mas drops')
+		uniqueMatch = QtBind.text(gui,uniqueSTRname).lower()
+		log(f'afterUniqueName: {afterUniqueName}')
+		log(f'uniqueMatch: {uniqueMatch}')
+		if QtBind.text(gui,configName) == '.' and uniqueMatch and uniqueMatch in afterUniqueName:
+			useSpecialReturnScroll()
+			QtBind.setText(gui, uniqueSTRname, '')
+			mirroring()
+			return
 
 def easyPickOLD(k=0):
 	temp = False
@@ -632,6 +656,9 @@ def alejare(distancia_objetivo):
 				Timer(0.2,infiniteMove,[B,distancia_objetivo,0,0]).start()
 
 skillsMedusa = []
+killer_name = ''
+killed_msg = ''
+killed_unique = ''
 
 def handle_joymax(opcode, data):
 	global partyNumber
@@ -649,10 +676,16 @@ def handle_joymax(opcode, data):
 	global LastUniqueInRange
 	global petrify
 	global dcName
+	global killer_name
+	global killed_msg
+	global killed_unique
+	global afterUniqueName
 	if opcode == 0x3040 and len(data) == 23:
 		verdemini(get_item(struct.unpack_from('i', data, 7)[0])['name'])
+		return True
 	elif opcode == 0xA101 and not get_client()['running']:
 		os.kill(os.getpid(), 9)
+		return True
 	elif opcode == 0x3041 and get_character_data()['player_id'] == struct.unpack_from('I',data,0)[0]:
 		if get_inventory()['items'][8]:
 			return
@@ -869,9 +902,11 @@ def handle_joymax(opcode, data):
 				threading.Thread(target=sendTelegram, args=[msg],).start()
 			elif 'Christmas Uniques:' in msg:
 				log(msg)
+				parsed_msg = msg[msg.find('[') + 1:-2]
+				msg = killer_name + '=> '+ killed_unique + ' ' + parsed_msg
 				azulPerma(msg)
 				if get_character_data()['name'] == 'Wan':
-					threading.Thread(target=sendTelegram, args=[msg],).start()
+					threading.Thread(target=sendTelegram2, args=[msg],).start()
 
 		return True
 	elif opcode == 0xB069: #Party Form
@@ -914,11 +949,16 @@ def handle_joymax(opcode, data):
 			name = str(data[8:])[2:-1]
 			uniqueNeim = get_monster(struct.unpack_from('<I', data, 2)[0])['name']
 			log(name + ' Killed  -> '+ uniqueNeim)
-			if ('Drager' in uniqueNeim or 'White Knight' in uniqueNeim) and get_character_data()['name'] == 'Wan':
-				sendTelegram2(name + ' Killed  -> '+ uniqueNeim)
-			if QtBind.text(gui,uniqueSTRname) != '' and QtBind.text(gui,uniqueSTRname).lower() in get_monster(struct.unpack_from('<I', data, 2)[0])['name'].lower():
+			if uniqueNeim == 'White Knight' or uniqueNeim == 'King Drager':
+				killer_name = name
+				killed_unique = uniqueNeim
+				# azulPerma(killer_name + ':   '+ killed_msg)
+			# if ('Drager' in uniqueNeim or 'White Knight' in uniqueNeim) and get_character_data()['name'] == 'Wan':
+			# 	sendTelegram2(killer_name + ':   '+ killed_msg)
+			if QtBind.text(gui,uniqueSTRname) != '' and QtBind.text(gui,uniqueSTRname).lower() in uniqueNeim.lower():
 				log('EJECUTANDO SCRIPT DE CAMBIO')
-				Timer(10,afterUnique).start()
+				afterUniqueName = uniqueNeim.lower()
+				# Timer(10,afterUnique).start()
 		elif data == bytes.fromhex('08 0C') and get_character_data()['name'] == 'Trump':
 			threading.Thread(target=sendTelegram, args=['Special trader shops with Bargain goods will start in 30 minutes.']).start()
 		elif data == bytes.fromhex('09 0C') and get_character_data()['name'] == 'Trump':
@@ -1175,12 +1215,27 @@ def handle_silkroad(opcode,data):
 	global energy
 	global mercaPos
 	global merca
+	global superBoleano
 	if opcode == 0x2002 and checkParty() and ('Verbotene Ebene' == get_zone_name(get_character_data()['region']) or 'Tempel'  == get_zone_name(get_character_data()['region'])):
 		pickWithPet()
+		return True
+	elif opcode == 0x7025 and data[0] == 2:
+		nameSize = struct.unpack_from('H', data, 2)[0]
+		charName = struct.unpack_from('<' + str(nameSize) + 's',data,4)[0].decode('cp1252')
+		msgSize = data[4+len(charName)]
+		msg = struct.unpack_from('<' + str(msgSize) + 's',data,nameSize+6)[0]
+		log(msg)
+		if msg.decode('cp1252') == 'f':
+			stop_trace()
+			stop_bot()
+		return True
+	elif opcode == 0x7060:
+		log('partinger')
 		return True
 	elif opcode == 0x715F: #scroles de la premium
 		stop_bot()
 		set_profile('Uniques')
+		return True
 	elif opcode == 0xA119: #HWID
 		log('HWID')
 		# log((' '.join('{:02X}'.format(x) for x in data)))
@@ -1293,10 +1348,11 @@ def handle_silkroad(opcode,data):
 			targetBol = not targetBol
 			targetGeneral()
 		elif data == b'\x29\x23\x00\x00': #Demon Hideout
-			morado('Quest')
+			morado('RTS')
 			stop_bot()
 			stop_trace()
-			set_profile('Quest')
+			set_profile('RTS')
+			return
 			npcs = get_npcs()
 			for id, npc in npcs.items():
 				if "SeaFarers Dimensional Gate" in npc['name']:
@@ -1365,7 +1421,7 @@ def handle_silkroad(opcode,data):
 				notice('Pick desactivado.')
 			threading.Thread(target=pick_loop).start()
 		elif data == b'\x05':
-			PICK = not PICK
+			superBoleano = not superBoleano
 			morado('4')
 			return False
 		elif data ==  b'\x04':
@@ -1378,6 +1434,7 @@ def handle_silkroad(opcode,data):
 			return False
 			# followUnique()
 		elif data ==  b'\x02':
+			morado('Follow Unique')
 			followUnique()
 			return False
 	elif opcode == 0x7402:
@@ -1391,30 +1448,31 @@ def handle_silkroad(opcode,data):
 	return True
 
 def telepor():
-	log('telepor')
-	ciudades = [25000,26959,26265,23687]
-	if get_position()['region'] in ciudades:
-		npcs = get_npcs()
-		for id, npc in npcs.items():
-			if "SeaFarers Dimensional Gate" in npc['name']:
-				log(npc['name'])
-				inject_joymax(0x705A, struct.pack('I',id)+b'\x02\xCF\x00\x00\x00', False) #
-				return
-			elif "Hotan" in npc['name']:
-				log(npc['name'])
-				inject_joymax(0x705A, struct.pack('I',id)+b'\x02\x01\x00\x00\x00', False) #
-				return
-			elif "Donwhang" in npc['name']:
-				log(npc['name'])
-				inject_joymax(0x705A, struct.pack('I',id)+b'\x02\x01\x00\x00\x00', False) #
-				return
-			elif "Constantinople" in npc['name']:
-				log(npc['name'])
-				inject_joymax(0x705A, struct.pack('I',id)+b'\x02\x01\x00\x00\x00', False) #
-				return
-		Timer(1,telepor).start()
-	elif get_zone_name(get_character_data()['region']) != 'Spiegeldimension':
-		Timer(3,telepor).start()
+	if superBoleano:
+		log('telepor')
+		ciudades = [25000,26959,26265,23687]
+		if get_position()['region'] in ciudades:
+			npcs = get_npcs()
+			for id, npc in npcs.items():
+				if "SeaFarers Dimensional Gate" in npc['name']:
+					log(npc['name'])
+					inject_joymax(0x705A, struct.pack('I',id)+b'\x02\xCF\x00\x00\x00', False) #
+					return
+				elif "Hotan" in npc['name']:
+					log(npc['name'])
+					inject_joymax(0x705A, struct.pack('I',id)+b'\x02\x01\x00\x00\x00', False) #
+					return
+				elif "Donwhang" in npc['name']:
+					log(npc['name'])
+					inject_joymax(0x705A, struct.pack('I',id)+b'\x02\x01\x00\x00\x00', False) #
+					return
+				elif "Constantinople" in npc['name']:
+					log(npc['name'])
+					inject_joymax(0x705A, struct.pack('I',id)+b'\x02\x01\x00\x00\x00', False) #
+					return
+			Timer(1,telepor).start()
+		elif get_zone_name(get_character_data()['region']) != 'Spiegeldimension':
+			Timer(3,telepor).start()
 
 def useEnergy():
 	global energy
@@ -1581,6 +1639,31 @@ KillClientCheck = QtBind.createCheckBox(gui,'AutoClientless','Auto Clientless',5
 QtBind.setChecked(gui, KillClientCheck, True)
 
 def testinger():
+	npcs = get_npcs()
+	for id, npc in npcs.items():
+		if npc['name'] == 'Daily Quest Manager Shadi':
+			log('Shadi	')
+			Timer(2, inject_joymax,[0x7045, struct.pack('I',id), False]).start() #Seleccionar NPC
+			Timer(2.5, inject_joymax,[0x7046, struct.pack('I',id) + b'\x02', False]).start() #Hablar con NPC
+			Timer(3, inject_joymax,[0x30D4, b'\x0B', False]).start() #Collecting Pharaoh Tomb Heart
+			Timer(3.5, inject_joymax,[0x30D4, b'\x05', False]).start() #Aceptar
+	return
+	afterUniqueNames = 'Isyutaru'
+	if QtBind.text(gui,uniqueSTRname).lower() in afterUniqueNames:
+		log(QtBind.text(gui,uniqueSTRname).lower())
+	return
+	data = bytes.fromhex('02 C9 08 00 43 75 61 6E 74 69 63 61 06 00 65 73 74 61 73 3F') #Cuantica 8
+	# data = bytes.fromhex('02 C7 05 00 41 72 6B 68 61 05 00 70 6C 61 74 6F') #Arkha 5
+	nameSize = struct.unpack_from('H', data, 2)[0]
+	charName = struct.unpack_from('<' + str(nameSize) + 's',data,4)[0].decode('cp1252')
+	msgSize = data[4+len(charName)]
+	log(struct.unpack_from('<' + str(msgSize) + 's',data,nameSize+6)[0])
+	# log(str(struct.unpack_from('s', data, int(QtBind.text(gui,text)))[0]))
+	return
+	msg = 'Christmas Uniques: Killed [20/21].'
+	parsed_msg = msg[msg.find('[') + 1:-2]
+	log(parsed_msg)
+	return
 	log(str(get_avatar()))
 	return
 	NotEasyPick()
@@ -2416,6 +2499,8 @@ def goUnique():
 						set_training_position(0,x1,y1,0)
 						log('iniciando bot por Unique')
 						start_bot()
+						UniqueStart = False
+						QtBind.setChecked(gui, UniqueStartSheck, False)
 					x2 = get_position()['x']
 					y2 = get_position()['y']
 					dis = ((x2-x1)**2+(y2-y1)**2)**1/2
@@ -2442,14 +2527,13 @@ def getWolf():
 				return pet	
 
 def followUnique():
-	global UINT
-	mobs = get_monsters()
-	for mobID in mobs:
-		if mobs[mobID]['type'] == 24:
-			move_to(mobs[mobID]['x'],mobs[mobID]['y'],0)
-			Timer(1,followUnique).start()
-			return
-	UINT = True
+	if superBoleano:
+		mobs = get_monsters()
+		for mobID in mobs:
+			if mobs[mobID]['type'] == 24:
+				move_to(mobs[mobID]['x'],mobs[mobID]['y'],0)
+				Timer(1,followUnique).start()
+				return
 
 DROP = False
 
@@ -2510,7 +2594,7 @@ balloon = False
 def event_loop():
 	global PICK
 	global uniques
-	if PICK:
+	if superBoleano:
 		mobs = get_monsters()
 		for mobID in mobs:
 			if mobs[mobID]['type'] == 24 and (mobs[mobID]['name'] in uniques or 'STR' in mobs[mobID]['name']):
@@ -4404,4 +4488,4 @@ def useRess():
 				return
 	log('No hay ress scroll...')
 
-log('[%s] Loaded v3.9' % __name__)
+log('[%s] Loaded v4.0' % __name__)
