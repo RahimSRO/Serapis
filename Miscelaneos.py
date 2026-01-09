@@ -907,6 +907,8 @@ def handle_joymax(opcode, data):
 				azulPerma(msg)
 				if get_character_data()['name'] == 'Wan':
 					threading.Thread(target=sendTelegram2, args=[msg],).start()
+			elif 'winner' in msg and get_character_data()['name'] == 'Wan':
+				threading.Thread(target=sendTelegram2, args=[msg],).start()
 
 		return True
 	elif opcode == 0xB069: #Party Form
@@ -934,7 +936,7 @@ def handle_joymax(opcode, data):
 		if data[0] == 5:# Unique Spawn
 			uniqueName = get_monster(struct.unpack_from('<I', data, 2)[0])['name']
 			log(uniqueName)
-			if UniqueAlert and (uniqueName in uniques or 'STR' in uniqueName) and get_character_data()['name'] == 'Seven':
+			if UniqueAlert and (uniqueName in uniques or ('STR' in uniqueName and USTR) or ('INT' in uniqueName and UINT)):
 				play_wav('Sounds/Unique.wav')
 				threading.Thread(target=sendTelegram, args=[uniqueName],).start()
 				attackWolf = False
@@ -1232,7 +1234,7 @@ def handle_silkroad(opcode,data):
 	elif opcode == 0x7060:
 		log('partinger')
 		return True
-	elif opcode == 0x715F: #scroles de la premium
+	elif opcode == 0x715F or opcode == 0xA460: #scroles de la premium / reverse morado
 		stop_bot()
 		set_profile('Uniques')
 		return True
@@ -1328,6 +1330,16 @@ def handle_silkroad(opcode,data):
 				start_bot()
 			merca = not merca
 			return False
+		elif data  ==  bytes.fromhex('2A 23 00 00'): #espaditas
+			morado('Espaditas')
+			Party = get_party()
+			if Party:
+				for memberID in Party:
+					if Party[memberID]['name'] == 'Miel' and Party[memberID]['region'] == get_character_data()['region']:
+						phBotChat.Private('Miel','reback')
+						return False
+				phBotChat.Private('Miel','r/')
+			return False
 		elif data == b'\x6D\x23\x00\x00':
 			morado('Uniques Profile')
 			Party = get_party()
@@ -1422,7 +1434,10 @@ def handle_silkroad(opcode,data):
 			threading.Thread(target=pick_loop).start()
 		elif data == b'\x05':
 			superBoleano = not superBoleano
-			morado('4')
+			if superBoleano:
+				morado('4')
+			else:
+				morado('444444444444444444444444444444444444444')
 			return False
 		elif data ==  b'\x04':
 			morado('Pick with hand')
@@ -1470,6 +1485,8 @@ def telepor():
 					log(npc['name'])
 					inject_joymax(0x705A, struct.pack('I',id)+b'\x02\x01\x00\x00\x00', False) #
 					return
+			if get_position()['region'] == 26265: #Donwhang
+				return
 			Timer(1,telepor).start()
 		elif get_zone_name(get_character_data()['region']) != 'Spiegeldimension':
 			Timer(3,telepor).start()
@@ -1576,7 +1593,7 @@ def handle_event(t, data):
 	elif t == 0 and UniqueAlert and '(INTs)' not in data and 'Apis' not in data and 'Priest of Luck' not in data and 'BeakYung' not in data and get_zone_name(get_character_data()['region']) != 'League Of Legends':
 		if get_character_data()['name'] != 'Seven':
 			phBotChat.Private('Seven',data)
-			UniqueStart = True
+			# UniqueStart = True
 		LastUniqueInRange = data
 		# targetUnique()
 		useSpeed()
@@ -1587,6 +1604,9 @@ def handle_event(t, data):
 		# cancelAlchemy()
 		if 'Balloon' not in data:
 			PICK = True
+			path = get_training_area()['path']
+			if 'STR' in data and 'ff.txt' in path:
+				UniqueStart = True
 			goUnique()
 	elif t == 8:
 		threading.Thread(target=sendTelegram2, args=['Alchemy Finished']).start()
@@ -1638,7 +1658,28 @@ clientlessbtn	= QtBind.createButton(gui,'killClient','Clientless',650,290)
 KillClientCheck = QtBind.createCheckBox(gui,'AutoClientless','Auto Clientless',560,260)
 QtBind.setChecked(gui, KillClientCheck, True)
 
+
+def kaledbowk():
+	if get_inventory()['items'][6]['name'] != 'Capricorn Grand Cross' or get_inventory()['items'][7]['name'] != 'Capricorn Heavenly Scutum':
+		return True
+	return False
+
+def equip():
+	for i,item in enumerate(get_inventory()['items']):
+		if item and i>12:
+			if '_SHIELD_' in item['servername']:
+				log('Equiping shield')
+				inject_joymax(0x7034, b'\x00'+ struct.pack('b', i) + b'\x07\x00\x00', True)
+			elif item['name'] == 'Capricorn Grand Cross':
+				log('Equiping 1h')
+				inject_joymax(0x7034, b'\x00'+ struct.pack('b', i) + b'\x06\x00\x00', True)
+
 def testinger():
+	if USTR:
+		log('true')
+	else:
+		log('false')
+	return
 	npcs = get_npcs()
 	for id, npc in npcs.items():
 		if npc['name'] == 'Daily Quest Manager Shadi':
@@ -1648,6 +1689,7 @@ def testinger():
 			Timer(3, inject_joymax,[0x30D4, b'\x0B', False]).start() #Collecting Pharaoh Tomb Heart
 			Timer(3.5, inject_joymax,[0x30D4, b'\x05', False]).start() #Aceptar
 	return
+	equipShield()
 	afterUniqueNames = 'Isyutaru'
 	if QtBind.text(gui,uniqueSTRname).lower() in afterUniqueNames:
 		log(QtBind.text(gui,uniqueSTRname).lower())
@@ -3235,6 +3277,29 @@ def update_town(name):
 
 scroll_time = ''
 
+
+def unique_start():
+	log('unique_start')
+	mobs = get_monsters()
+	if superBoleano:
+		for mobID in mobs:
+			if mobs[mobID]['type'] == 24:
+				log('Hay Unique')
+				x2 = mobs[mobID]['x']
+				y2 = mobs[mobID]['y']
+				x1 = get_position()['x']
+				y1 = get_position()['y']
+				dis = ((x2-x1)**2+(y2-y1)**2)**1/2
+				move_to(x2,y2,0)
+				log('Nos movemos')
+				if dis < 5:
+					log('dis menor a 5')
+					set_training_position(0, get_character_data()['x'], get_character_data()['y'], 0)
+					start_bot()
+					return
+		Timer(0.5,unique_start).start()
+
+
 def handle_chat(t,player,msg):
 	#1 All
 	#2 Private
@@ -3261,6 +3326,36 @@ def handle_chat(t,player,msg):
 	global UniqueAlert
 	if msg == '.c':
 		inject_joymax(0x705B, bytearray(), False)
+	elif msg[0] == 'q' and msg[1:].isnumeric():
+		questNumber = int(msg[1:])
+		npcs = get_npcs()
+		for id, npc in npcs.items():
+			if npc['name'] == 'Daily Quest Manager Shadi':
+				log('Shadi	')
+				Timer(1, inject_joymax,[0x7045, struct.pack('I',id), False]).start() #Seleccionar NPC
+				Timer(1.5, inject_joymax,[0x7046, struct.pack('I',id) + b'\x02', False]).start() #Hablar con NPC
+				Timer(2, inject_joymax,[0x30D4, struct.pack('I',questNumber), False]).start() #Collecting Pharaoh Tomb Heart
+				Timer(2.5, inject_joymax,[0x30D4, b'\x05', False]).start() #Aceptar
+				Timer(3, inject_joymax,[0x30D4, b'\x05', False]).start() #Aceptar
+	elif msg == 'exit!':
+		npcs = get_npcs()
+		for id, npc in npcs.items():
+			if npc['name'] == 'Daily Quest Manager Shadi':
+				inject_joymax(0x30D4, b'\x05', False) #exit
+				return
+	elif msg == 'reback' and t == 2:
+		useSpecialReturnScroll()
+		mirroring()
+	elif msg == 'r/' and get_character_data()['name'] != player:
+		for slot, item in enumerate(get_inventory()['items']):
+			if slot > 13 and item:
+				if item['name'] == 'Special Reverse Return':
+					stop_bot()
+					data = struct.pack('H', len(player)) + player.encode('ascii') + struct.pack('b', slot)
+					log((' '.join('{:02X}'.format(x) for x in data)))
+					inject_joymax(0xA459,data,True)
+					unique_start()
+					return True
 	elif msg == 'une':
 		une()
 	elif msg == 'res*':
@@ -3771,6 +3866,12 @@ stop'''
 			if "Jangan" in npc['name']:
 				inject_joymax(0x705A, struct.pack('I',id)+b'\x02\x02\x00\x00\x00', False) #JGDW
 				break
+	elif msg.lower() == 'hwt': #0x705A (Data) 02 00 00 00 02 A5 00 00 00
+		npcs = get_npcs()
+		for id, npc in npcs.items():
+			if "Kings Valley" in npc['name']:
+				inject_joymax(0x705A, struct.pack('I',id)+b'\x02\xA5\x00\x00\x00', False) #JGDW
+				break
 	elif msg[:3].lower() =='pt:':
 		inject_joymax(0x7061, bytearray(), False)
 		partyNumber = int(msg[3:])
@@ -3955,6 +4056,10 @@ stop'''
 		manito60()
 	elif msg.lower() == 'scroll':
 		useSpecialReturnScroll()
+	elif msg.lower() == 'scrol' and get_character_data()['name'] == player:
+		useSpecialReturnScroll()
+	elif msg[:2] == '**' and get_character_data()['name'] == player :
+		QtBind.setText(gui, uniqueSTRname, msg[2:])
 	elif msg == 'term':
 		pets = get_pets()
 		if pets:
@@ -4225,7 +4330,7 @@ def changeTrainingArea(area):
 
 def killAfterJoined(dcName):
 	global CLIENTLESS_BOL
-	ignore_dc_names = ['Seven','Zoser','Norte','Gana','Clear']
+	ignore_dc_names = ['Seven','Miel','Norte','Gana','Clear']
 	if CLIENTLESS_BOL and dcName not in ignore_dc_names:
 		log('not in dc name')
 		killClient()
@@ -4243,6 +4348,8 @@ def joined_game():
 	if get_character_data()['name'] == 'Seven':
 		UniqueAlert = True
 		QtBind.setChecked(gui, UniqueCheck, UniqueAlert)
+		USTR = True
+		QtBind.setChecked(gui, gSTR, USTR)
 	else:
 		if os.environ['COMPUTERNAME'] == 'LAPTOP':
 			Timer(50,killAfterJoined,[dcName]).start()
@@ -4261,6 +4368,8 @@ def joint():
 if get_character_data()['name'] == 'Seven':
 	UniqueAlert = True
 	QtBind.setChecked(gui, UniqueCheck, UniqueAlert)
+	USTR = True
+	QtBind.setChecked(gui, gSTR, USTR)
 
 def pick_loop():
 	stop_trace()
@@ -4488,4 +4597,4 @@ def useRess():
 				return
 	log('No hay ress scroll...')
 
-log('[%s] Loaded v4.0' % __name__)
+log('[%s] Loaded v4.2' % __name__)
